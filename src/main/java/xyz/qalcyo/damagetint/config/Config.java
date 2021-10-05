@@ -52,5 +52,6 @@ public class Config extends Vigilant {
 
     public Config() {
         super(new File(DamageTint.modDir, "damagetint.toml"), "Damage Tint");
+        initialize();
     }
 }
