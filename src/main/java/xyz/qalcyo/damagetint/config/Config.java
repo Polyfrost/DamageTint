@@ -22,13 +22,37 @@ public class Config extends Vigilant {
     public static boolean toggle = true;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "Chroma",
+            description = "Whether or not to turn on a chroma effect. Overrides Damage Tint Colour (except the alpha / transparency colour modifier).",
+            category = "General"
+    )
+    public static boolean chroma = false;
+
+    @Property(
+            type = PropertyType.NUMBER,
+            name = "Chroma Speed",
+            description = "Choose the speed of the chroma colour.",
+            category = "General",
+            min = 1,
+            max = 10
+    )
+    public static int speed = 5;
+
+    @Property(
             type = PropertyType.COLOR,
             name = "Damage Tint Colour",
             description = "Modify the damage tint when mobs take damage.",
-            category = "General",
-            allowAlpha = false
+            category = "General"
     )
-    public static Color color = Color.RED;
+    public static Color color = new Color(255, 0, 0, 76);
+
+    @Property(
+            type = PropertyType.SWITCH, name = "Fade Damage Tint",
+            description = "Gradually fade the damage tint when hit.",
+            category = "General"
+    )
+    public static boolean fade = false;
 
     @Property(
             type = PropertyType.SWITCH,
@@ -38,6 +62,11 @@ public class Config extends Vigilant {
     )
     public static boolean showUpdate = true;
 
+    public Config() {
+        super(new File(DamageTint.modDir, "damagetint.toml"), "Damage Tint");
+        initialize();
+    }
+
     @Property(
             type = PropertyType.BUTTON,
             name = "Update Now",
@@ -46,12 +75,8 @@ public class Config extends Vigilant {
     )
     public void update() {
         if (Updater.shouldUpdate) EssentialAPI.getGuiUtil()
-                .openScreen(new DownloadConfirmGui(Minecraft.getMinecraft().currentScreen)); else EssentialAPI.getNotifications()
+                .openScreen(new DownloadConfirmGui(Minecraft.getMinecraft().currentScreen));
+        else EssentialAPI.getNotifications()
                 .push("Damage Tint", "No update had been detected at startup, and thus the update GUI has not been shown.");
-    }
-
-    public Config() {
-        super(new File(DamageTint.modDir, "damagetint.toml"), "Damage Tint");
-        initialize();
     }
 }
