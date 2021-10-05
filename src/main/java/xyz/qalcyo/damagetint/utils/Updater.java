@@ -1,16 +1,17 @@
-package xyz.qalcyo.template.utils;
+package xyz.qalcyo.damagetint.utils;
 
 import com.google.gson.JsonObject;
+import gg.essential.api.EssentialAPI;
+import gg.essential.api.utils.Multithreading;
+import kotlin.Unit;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import xyz.matthewtgm.requisite.util.GuiHelper;
-import xyz.matthewtgm.requisite.util.Multithreading;
-import xyz.matthewtgm.requisite.util.Notifications;
-import xyz.qalcyo.template.ForgeTemplate;
-import xyz.qalcyo.template.gui.DownloadConfirmGui;
+import xyz.qalcyo.damagetint.DamageTint;
+import xyz.qalcyo.damagetint.config.Config;
+import xyz.qalcyo.damagetint.gui.DownloadConfirmGui;
 
 import java.awt.*;
 import java.io.File;
@@ -25,22 +26,30 @@ public class Updater {
 
     public static void update() {
         Multithreading.runAsync(() -> {
-            JsonObject latestRelease = APIUtil.getJSONResponse("https://api.github.com/repos/Qalcyo/" + ForgeTemplate.ID + "/releases/latest");
-            latestTag = latestRelease.get("tag_name").getAsString();
-            DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(StringUtils.substringBefore(ForgeTemplate.VER, "-"));
-            DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(StringUtils.substringBefore(StringUtils.substringAfter(latestTag, "v"), "-"));
-
-            if (ForgeTemplate.VER.contains("BETA") || currentVersion.compareTo(latestVersion) < 0) {
-                return;
-            }
-            updateUrl = latestRelease.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
-            if (!updateUrl.isEmpty()) {
-                Notifications.push(ForgeTemplate.NAME, ForgeTemplate.NAME + " has a new update (" + latestTag + ")! Click here to download it automatically!", () -> {
-                    GuiHelper.open(new DownloadConfirmGui(Minecraft.getMinecraft().currentScreen));
-                });
-                shouldUpdate = true;
+            try {
+                JsonObject latestRelease = APIUtil.getJSONResponse("https://api.github.com/repos/Qalcyo/" + DamageTint.ID + "/releases/latest");
+                latestTag = latestRelease.get("tag_name").getAsString();
+                DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(StringUtils.substringBefore(DamageTint.VER, "-"));
+                DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(StringUtils.substringBefore(StringUtils.substringAfter(latestTag, "v"), "-"));
+                if (DamageTint.VER.contains("BETA") || currentVersion.compareTo(latestVersion) >= 0) {
+                    System.out.println("Either current version is on a beta, or the current version is the same or newer than the latest version.");
+                    return;
+                }
+                updateUrl = latestRelease.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
+                if (!updateUrl.isEmpty()) {
+                    if (Config.showUpdate) {
+                        EssentialAPI.getNotifications().push(DamageTint.NAME, DamageTint.NAME + " has a new update (" + latestTag + ")! Click here to download it automatically!", Updater::openUpdateGui);
+                    }
+                    shouldUpdate = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
+    }
+    public static Unit openUpdateGui() {
+        EssentialAPI.getGuiUtil().openScreen(new DownloadConfirmGui(Minecraft.getMinecraft().currentScreen));
+        return Unit.INSTANCE;
     }
 
     public static boolean download(String url, File file) {
@@ -71,12 +80,11 @@ public class Updater {
             try {
                 String runtime = getJavaRuntime();
                 if (Minecraft.isRunningOnMac) {
-
-                    Desktop.getDesktop().open(ForgeTemplate.jarFile.getParentFile());
+                    Desktop.getDesktop().open(DamageTint.jarFile.getParentFile());
                 }
-                File file = new File(ForgeTemplate.modDir.getParentFile(), "Deleter-1.2.jar");
+                File file = new File(DamageTint.modDir.getParentFile(), "Deleter-1.2.jar");
                 Runtime.getRuntime()
-                        .exec("\"" + runtime + "\" -jar \"" + file.getAbsolutePath() + "\" \"" + ForgeTemplate.jarFile.getAbsolutePath() + "\"");
+                        .exec("\"" + runtime + "\" -jar \"" + file.getAbsolutePath() + "\" \"" + DamageTint.jarFile.getAbsolutePath() + "\"");
             } catch (Exception e) {
                 e.printStackTrace();
             }

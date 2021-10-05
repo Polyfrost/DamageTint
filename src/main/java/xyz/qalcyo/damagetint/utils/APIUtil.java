@@ -1,4 +1,4 @@
-package xyz.qalcyo.template.utils;
+package xyz.qalcyo.damagetint.utils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -13,7 +13,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import xyz.qalcyo.template.ForgeTemplate;
+import xyz.qalcyo.damagetint.DamageTint;
 
 import java.net.URI;
 import java.util.Scanner;
@@ -26,7 +26,7 @@ public class APIUtil {
 
     private static final JsonParser parser = new JsonParser();
 
-    public static final HttpClientBuilder builder = HttpClients.custom().setUserAgent(ForgeTemplate.ID + "/" + ForgeTemplate.VER)
+    public static final HttpClientBuilder builder = HttpClients.custom().setUserAgent(DamageTint.ID + "/" + DamageTint.VER)
             .addInterceptorFirst(((HttpRequest request, HttpContext context) -> {
                 if (!request.containsHeader("Pragma")) request.addHeader("Pragma", "no-cache");
                 if (!request.containsHeader("Cache-Control")) request.addHeader("Cache-Control", "no-cache");

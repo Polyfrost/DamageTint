@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.7",
+  "package": "xyz.qalcyo.damagetint.mixin",
+  "refmap": "mixins.damagetint.refmap.json",
+  "mixins": [
+    "RendererLivingEntityMixin"
+  ],
+  "verbose": true
+}

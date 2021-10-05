@@ -1,11 +1,11 @@
 <div align="center">
 
-# Template
+# Damage Tint
 
 </div>
 
 ## About
-Placeholder.
+A mod which changes the color of entities that are hurt. 
 
-## How to install
-Placeholder
+## Examples
+TODO: add images here lol

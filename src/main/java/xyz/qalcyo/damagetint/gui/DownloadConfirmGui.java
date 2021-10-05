@@ -1,20 +1,20 @@
-package xyz.qalcyo.template.gui;
+package xyz.qalcyo.damagetint.gui;
 
+import gg.essential.api.EssentialAPI;
+import gg.essential.api.utils.Multithreading;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.StringUtils;
-import xyz.matthewtgm.requisite.util.GuiHelper;
-import xyz.matthewtgm.requisite.util.Multithreading;
-import xyz.matthewtgm.requisite.util.Notifications;
-import xyz.qalcyo.template.ForgeTemplate;
-import xyz.qalcyo.template.utils.Updater;
+import xyz.qalcyo.damagetint.DamageTint;
+import xyz.qalcyo.damagetint.utils.Updater;
 
 import java.io.File;
 
 public class DownloadConfirmGui extends GuiScreen {
     private final GuiScreen parent;
+
     public DownloadConfirmGui(GuiScreen parent) {
         this.parent = parent;
     }
@@ -29,31 +29,31 @@ public class DownloadConfirmGui extends GuiScreen {
     @Override
     public void actionPerformed(GuiButton button) {
         switch (button.id) {
-            case 1:
-                GuiHelper.open(null);
+            case 0:
+                EssentialAPI.getGuiUtil().openScreen(parent);
                 Multithreading.runAsync(() -> {
                     if (Updater.download(
                             Updater.updateUrl,
-                            new File("mods/" + ForgeTemplate.NAME + "-" + StringUtils.substringAfter(Updater.latestTag, "v") + ".jar")
+                            new File("mods/" + DamageTint.NAME + "-" + StringUtils.substringAfter(Updater.latestTag, "v") + ".jar")
                     ) && Updater.download(
                             "https://github.com/Qalcyo/Deleter/releases/download/v1.2/Deleter-1.2.jar",
-                            new File(ForgeTemplate.modDir.getParentFile(), "Deleter-1.2.jar")
+                            new File(DamageTint.modDir.getParentFile(), "Deleter-1.2.jar")
                     )
                     ) {
-                        Notifications
-                                .push(ForgeTemplate.NAME, "The ingame updater has successfully installed the newest version.");
+                        EssentialAPI.getNotifications()
+                                .push(DamageTint.NAME, "The ingame updater has successfully installed the newest version.");
                         Updater.addShutdownHook();
                         Updater.shouldUpdate = false;
                     } else {
-                        Notifications.push(
-                                ForgeTemplate.NAME,
+                        EssentialAPI.getNotifications().push(
+                                DamageTint.NAME,
                                 "The ingame updater has NOT installed the newest version as something went wrong."
                         );
                     }
                 });
                 break;
-            case 2:
-                GuiHelper.open(parent);
+            case 1:
+                EssentialAPI.getGuiUtil().openScreen(parent);
         }
     }
 
@@ -64,7 +64,7 @@ public class DownloadConfirmGui extends GuiScreen {
         GlStateManager.scale(2f, 2f, 0f);
         drawCenteredString(
                 fontRendererObj,
-                EnumChatFormatting.DARK_PURPLE + ForgeTemplate.NAME,
+                EnumChatFormatting.DARK_PURPLE + DamageTint.NAME,
                 width / 4,
                 3,
                 -1
@@ -75,7 +75,7 @@ public class DownloadConfirmGui extends GuiScreen {
         String[] lines = new String[]{
                 "Are you sure you want to update?",
                 "You can download it ingame at any time via the configuration screen.",
-                "(This will update from v" + ForgeTemplate.VER + " to " + Updater.latestTag + ")"
+                "(This will update from v" + DamageTint.VER + " to " + Updater.latestTag + ")"
         };
         int offset = Math.max(85 - lines.length * 10, 10);
 
