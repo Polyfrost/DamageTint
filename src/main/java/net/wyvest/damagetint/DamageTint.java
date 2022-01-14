@@ -1,14 +1,12 @@
-package xyz.qalcyo.damagetint;
+package net.wyvest.damagetint;
 
-import gg.essential.api.EssentialAPI;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import xyz.qalcyo.damagetint.command.DamageTintCommand;
-import xyz.qalcyo.damagetint.config.Config;
-import xyz.qalcyo.damagetint.utils.Updater;
+import net.wyvest.damagetint.command.DamageTintCommand;
+import net.wyvest.damagetint.config.Config;
+import net.wyvest.damagetint.updater.Updater;
 
 import java.io.File;
 
@@ -16,12 +14,8 @@ import java.io.File;
 public class DamageTint {
     public static final String NAME = "@NAME@", VER = "@VER@", ID = "@ID@";
     public static File jarFile;
-    public static File modDir = new File(new File(new File(Minecraft.getMinecraft().mcDataDir, "config"), "Qalcyo"), NAME);
-    public static void sendMessage(String message) {
-        EssentialAPI.getMinecraftUtil().sendMessage(EnumChatFormatting.DARK_PURPLE + "[" + NAME + "] ", message);
-    }
+    public static File modDir = new File(new File(Minecraft.getMinecraft().mcDataDir, "W-OVERFLOW"), NAME);
     public static Config config;
-    public static DamageTintCommand command;
 
     @Mod.EventHandler
     protected void onFMLPreInitialization(FMLPreInitializationEvent event) {
@@ -33,8 +27,7 @@ public class DamageTint {
     protected void onInitialization(FMLInitializationEvent event) {
         config = new Config();
         config.preload();
-        command = new DamageTintCommand();
-        command.register();
+        new DamageTintCommand().register();
         Updater.update();
     }
 

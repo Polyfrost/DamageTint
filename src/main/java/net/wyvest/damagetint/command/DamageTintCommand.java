@@ -1,9 +1,9 @@
-package xyz.qalcyo.damagetint.command;
+package net.wyvest.damagetint.command;
 
 import gg.essential.api.EssentialAPI;
 import gg.essential.api.commands.Command;
 import gg.essential.api.commands.DefaultHandler;
-import xyz.qalcyo.damagetint.DamageTint;
+import net.wyvest.damagetint.DamageTint;
 
 public class DamageTintCommand extends Command {
     public DamageTintCommand() {
