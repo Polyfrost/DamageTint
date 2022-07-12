@@ -1,12 +1,12 @@
 package net.wyvest.damagetint;
 
+import cc.polyfrost.oneconfig.utils.commands.CommandManager;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.wyvest.damagetint.command.DamageTintCommand;
-import net.wyvest.damagetint.config.Config;
-import net.wyvest.damagetint.updater.Updater;
+import net.wyvest.damagetint.config.DamageTintConfig;
 
 import java.io.File;
 
@@ -15,7 +15,7 @@ public class DamageTint {
     public static final String NAME = "@NAME@", VER = "@VER@", ID = "@ID@";
     public static File jarFile;
     public static File modDir = new File(new File(Minecraft.getMinecraft().mcDataDir, "W-OVERFLOW"), NAME);
-    public static Config config;
+    public static DamageTintConfig config;
 
     @Mod.EventHandler
     protected void onFMLPreInitialization(FMLPreInitializationEvent event) {
@@ -25,10 +25,9 @@ public class DamageTint {
 
     @Mod.EventHandler
     protected void onInitialization(FMLInitializationEvent event) {
-        config = new Config();
-        config.preload();
-        new DamageTintCommand().register();
-        Updater.update();
+        config = new DamageTintConfig();
+        config.initialize();
+        CommandManager.INSTANCE.registerCommand(DamageTintCommand.class);
     }
 
 }

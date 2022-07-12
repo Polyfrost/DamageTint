@@ -1,17 +1,14 @@
 package net.wyvest.damagetint.command;
 
-import gg.essential.api.EssentialAPI;
-import gg.essential.api.commands.Command;
-import gg.essential.api.commands.DefaultHandler;
+import cc.polyfrost.oneconfig.utils.commands.annotations.Command;
+import cc.polyfrost.oneconfig.utils.commands.annotations.Main;
 import net.wyvest.damagetint.DamageTint;
 
-public class DamageTintCommand extends Command {
-    public DamageTintCommand() {
-        super("damagetint", true);
-    }
+@Command("damagetint")
+public class DamageTintCommand {
 
-    @DefaultHandler
-    public void handle() {
-        EssentialAPI.getGuiUtil().openScreen(DamageTint.config.gui());
+    @Main
+    public static void handle() {
+        DamageTint.config.openGui();
     }
 }
