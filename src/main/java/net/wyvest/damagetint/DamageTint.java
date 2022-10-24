@@ -19,7 +19,9 @@ public class DamageTint {
 
     @Mod.EventHandler
     protected void onFMLPreInitialization(FMLPreInitializationEvent event) {
-        if (!modDir.exists()) modDir.mkdirs();
+        if (!modDir.exists() && !modDir.mkdirs()) {
+            throw new RuntimeException("Failed to create mod directory! Please report this: https://polyfrost.cc/discord");
+        }
         jarFile = event.getSourceFile();
     }
 
@@ -27,7 +29,7 @@ public class DamageTint {
     protected void onInitialization(FMLInitializationEvent event) {
         config = new DamageTintConfig();
         config.initialize();
-        CommandManager.INSTANCE.registerCommand(DamageTintCommand.class);
+        CommandManager.INSTANCE.registerCommand(new DamageTintCommand());
     }
 
 }

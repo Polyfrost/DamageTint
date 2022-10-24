@@ -6,9 +6,8 @@ import net.wyvest.damagetint.DamageTint;
 
 @Command("damagetint")
 public class DamageTintCommand {
-
     @Main
-    public static void handle() {
+    public void handle() {
         DamageTint.config.openGui();
     }
 }

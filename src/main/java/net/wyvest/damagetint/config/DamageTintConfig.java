@@ -1,6 +1,7 @@
 package net.wyvest.damagetint.config;
 
 import cc.polyfrost.oneconfig.config.Config;
+import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.annotations.Switch;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.data.Mod;
@@ -12,7 +13,7 @@ import java.io.File;
 
 public class DamageTintConfig extends Config {
 
-    @cc.polyfrost.oneconfig.config.annotations.Color(
+    @Color(
             name = "Damage Tint Colour"
     )
     public static OneColor color = new OneColor(255, 0, 0, 76);
