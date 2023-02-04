@@ -24,6 +24,6 @@ public class DamageTintConfig extends Config {
     public static boolean fade = false;
 
     public DamageTintConfig() {
-        super(new Mod(DamageTint.NAME, ModType.UTIL_QOL, new VigilanceMigrator(new File(DamageTint.modDir, "damagetint.toml").getPath())), "damagetint.json");
+        super(new Mod(DamageTint.NAME, ModType.UTIL_QOL, "/damagetint_dark.svg", new VigilanceMigrator(new File(DamageTint.modDir, "damagetint.toml").getPath())), "damagetint.json");
     }
 }

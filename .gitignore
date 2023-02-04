@@ -6,7 +6,7 @@
 
 # Gradle
 .gradle
-/build/
+**/build/
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
@@ -20,4 +20,4 @@ gradle-app.setting
 *.iws
 
 # Minecraft
-/run/
+**/run/

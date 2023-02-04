@@ -1,12 +1,12 @@
 [
   {
     "name": "${name}",
-    "description": "",
+    "description": "A mod which changes the color of entities that are hurt.",
     "version": "${version}",
     "url": "",
     "updateUrl": "",
     "authorList": [
-      "W-OVERFLOW"
+      "Polyfrost"
     ],
     "credits": "",
     "logoFile": "",
