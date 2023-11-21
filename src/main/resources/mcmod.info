@@ -1,8 +1,10 @@
 [
   {
+    "modid": "${id}",
     "name": "${name}",
     "description": "A mod which changes the color of entities that are hurt.",
     "version": "${version}",
+    "mcversion": "1.8.9",
     "url": "",
     "updateUrl": "",
     "authorList": [

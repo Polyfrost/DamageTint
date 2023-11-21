@@ -1,11 +1,12 @@
-package net.wyvest.damagetint.mixin;
+package org.polyfrost.damagetint.mixin;
 
 import cc.polyfrost.oneconfig.utils.color.ColorUtils;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
-import net.wyvest.damagetint.DamageTint;
-import net.wyvest.damagetint.config.DamageTintConfig;
+import org.polyfrost.damagetint.DamageTint;
+import org.polyfrost.damagetint.config.DamageTintConfig;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -13,11 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RendererLivingEntity.class)
 public class RendererLivingEntityMixin {
-    private EntityLivingBase entitylivingbaseIn;
+    @Unique
+    private EntityLivingBase damageTint$entitylivingbaseIn;
 
     @Inject(method = "setBrightness", at = @At("HEAD"))
     private void set(EntityLivingBase entitylivingbaseIn, float partialTicks, boolean combineTextures, CallbackInfoReturnable<Boolean> cir) {
-        this.entitylivingbaseIn = entitylivingbaseIn;
+        damageTint$entitylivingbaseIn = entitylivingbaseIn;
     }
 
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 0))
@@ -48,7 +50,7 @@ public class RendererLivingEntityMixin {
     private float getAlphaTint(float f) {
         if (DamageTint.config.enabled) {
             if (DamageTintConfig.fade) {
-                float percent = 1.0F - (float) entitylivingbaseIn.hurtTime / (float) entitylivingbaseIn.maxHurtTime;
+                float percent = 1.0F - (float) damageTint$entitylivingbaseIn.hurtTime / (float) damageTint$entitylivingbaseIn.maxHurtTime;
                 percent = percent < 0.5F ? percent / 0.5F : (1.0F - percent) / 0.5F;
                 return (float) ColorUtils.getAlpha(DamageTintConfig.color.getRGB()) * percent / 255.0F;
             } else {

@@ -1,10 +1,9 @@
 {
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.7",
-  "package": "net.wyvest.damagetint.mixin",
+  "package": "org.polyfrost.damagetint.mixin",
   "refmap": "mixins.damagetint.refmap.json",
   "mixins": [
     "RendererLivingEntityMixin"
-  ],
-  "verbose": true
+  ]
 }

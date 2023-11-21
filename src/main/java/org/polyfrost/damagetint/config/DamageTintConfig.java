@@ -1,13 +1,15 @@
-package net.wyvest.damagetint.config;
+package org.polyfrost.damagetint.config;
 
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.Color;
+import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import cc.polyfrost.oneconfig.config.annotations.Switch;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.migration.VigilanceMigrator;
-import net.wyvest.damagetint.DamageTint;
+import net.minecraft.client.Minecraft;
+import org.polyfrost.damagetint.DamageTint;
 
 import java.io.File;
 
@@ -23,7 +25,10 @@ public class DamageTintConfig extends Config {
     )
     public static boolean fade = false;
 
+    @Exclude private static final File oldModDir = new File(new File(Minecraft.getMinecraft().mcDataDir, "W-OVERFLOW"), "DamageTint");
+
     public DamageTintConfig() {
-        super(new Mod(DamageTint.NAME, ModType.UTIL_QOL, "/damagetint_dark.svg", new VigilanceMigrator(new File(DamageTint.modDir, "damagetint.toml").getPath())), "damagetint.json");
+        super(new Mod(DamageTint.NAME, ModType.UTIL_QOL, "/damagetint_dark.svg", new VigilanceMigrator(new File(oldModDir, "damagetint.toml").getPath())), "damagetint.json");
+        initialize();
     }
 }

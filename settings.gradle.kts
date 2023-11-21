@@ -1,30 +1,26 @@
+@file:Suppress("PropertyName")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-        maven("https://repo.polyfrost.cc/releases")
-        maven("https://maven.architectury.dev/")
+        maven("https://repo.polyfrost.org/releases") // Adds the Polyfrost maven repository to get Polyfrost Gradle Toolkit
     }
     plugins {
-        val egtVersion = "0.1.10"
-        id("gg.essential.multi-version.root") version egtVersion
-    }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "io.github.juuxel.loom-quiltflower-mini") {
-                useModule("com.github.wyvest:loom-quiltflower-mini:${requested.version}")
-            }
-        }
+        val pgtVersion = "0.2.9" // Sets the default versions for Polyfrost Gradle Toolkit
+        id("org.polyfrost.multi-version.root") version pgtVersion
     }
 }
 
 val mod_name: String by settings
 
+// Configures the root project Gradle name based on the value in `gradle.properties`
 rootProject.name = mod_name
 rootProject.buildFileName = "root.gradle.kts"
 
+// Adds all of our build target versions to the classpath if we need to add version-specific code.
 listOf(
-    "1.8.9-forge"
+    "1.8.9-forge" // Update this if you want to remove/add a version, along with `build.gradle.kts` and `root.gradle.kts`.
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
