@@ -1,6 +1,7 @@
 package org.polyfrost.damagetint.config;
 
 import cc.polyfrost.oneconfig.config.Config;
+import cc.polyfrost.oneconfig.config.annotations.Button;
 import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import cc.polyfrost.oneconfig.config.annotations.Switch;
@@ -15,10 +16,22 @@ import java.io.File;
 
 public class DamageTintConfig extends Config {
 
+    @Exclude private static final int defaultColor = 1291780096;
+
     @Color(
             name = "Damage Tint Colour"
     )
-    public static OneColor color = new OneColor(255, 0, 0, 76);
+    public static OneColor color = new OneColor(defaultColor);
+
+    @Button(
+            name = "Reset Damage Tint",
+            text = "Reset Color"
+    )
+    Runnable resetColor = (() -> {
+        color = new OneColor(defaultColor);
+        save();
+        openGui();
+    });
 
     @Switch(
             name = "Fade Out Damage Tint"
