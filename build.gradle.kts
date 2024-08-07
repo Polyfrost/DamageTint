@@ -23,6 +23,10 @@ val mod_version: String by project
 val mod_id: String by project
 val mod_archives_name: String by project
 
+kotlin.jvmToolchain {
+    this.languageVersion.set(JavaLanguageVersion.of(8))
+}
+
 // Replaces the variables in `ExampleMod.java` to the ones specified in `gradle.properties`.
 blossom {
     replaceToken("@VER@", mod_version)
@@ -51,8 +55,8 @@ loom {
     if (project.platform.isLegacyForge) {
         runConfigs {
             "client" {
-                programArgs("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
-                property("mixin.debug.export", "true") // Outputs all mixin changes to `versions/{mcVersion}/run/.mixin.out/class`
+                programArgs("--tweakClass", "org.polyfrost.oneconfig.internal.legacy.OneConfigTweaker")
+                programArgs("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             }
         }
     }
@@ -83,21 +87,30 @@ sourceSets {
 
 // Adds the Polyfrost maven repository so that we can get the libraries necessary to develop the mod.
 repositories {
+    maven("https://repo.polyfrost.org/snapshots")
     maven("https://repo.polyfrost.org/releases")
 }
 
 // Configures the libraries/dependencies for your mod.
 dependencies {
     // Adds the OneConfig library, so we can develop with it.
-    modCompileOnly("cc.polyfrost:oneconfig-$platform:0.2.2-alpha+")
+    val oneconfig = "1.0.0-alpha.21"
+    implementation("org.polyfrost.oneconfig:config-impl:$oneconfig")
+    implementation("org.polyfrost.oneconfig:commands:$oneconfig")
+    implementation("org.polyfrost.oneconfig:events:$oneconfig")
+    implementation("org.polyfrost.oneconfig:ui:$oneconfig")
+    implementation("org.polyfrost.oneconfig:internal:$oneconfig")
+    modImplementation("org.polyfrost.oneconfig:$platform:$oneconfig")
 
     // Adds DevAuth, which we can use to log in to Minecraft in development.
     modRuntimeOnly("me.djtheredstoner:DevAuth-${if (platform.isFabric) "fabric" else if (platform.isLegacyForge) "forge-legacy" else "forge-latest"}:1.2.0")
 
+    shade("com.github.ben-manes.caffeine:caffeine:2.9.3")
+
     // If we are building for legacy forge, includes the launch wrapper with `shade` as we configured earlier, as well as mixin 0.7.11
     if (platform.isLegacyForge) {
         compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
-        shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
+        // shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
     }
 }
 
@@ -167,6 +180,7 @@ tasks {
         archiveClassifier.set("dev")
         configurations = listOf(shade, modShade)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        relocate("com.github.benmanes", "org.polyfrost.damagetint.libs")
     }
 
     remapJar {
@@ -182,7 +196,7 @@ tasks {
                 "ForceLoadAsMod" to true, // We want to load this jar as a mod, so we force Forge to do so.
                 "TweakOrder" to "0", // Makes sure that the OneConfig launch wrapper is loaded as soon as possible.
                 "MixinConfigs" to "mixins.${mod_id}.json", // We want to use our mixin configuration, so we specify it here.
-                "TweakClass" to "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker" // Loads the OneConfig launch wrapper.
+                "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker"
             )
         }
         dependsOn(shadowJar)
