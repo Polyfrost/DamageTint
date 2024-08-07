@@ -1,10 +1,10 @@
 package org.polyfrost.damagetint.mixin;
 
-import cc.polyfrost.oneconfig.utils.color.ColorUtils;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import org.polyfrost.damagetint.DamageTint;
 import org.polyfrost.damagetint.config.DamageTintConfig;
+import org.polyfrost.polyui.utils.ColorUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +25,7 @@ public class RendererLivingEntityMixin {
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 0))
     private float getRedTint(float f) {
         if (DamageTint.config.enabled) {
-            return ((float) ColorUtils.getRed(DamageTintConfig.color.getRGB())) / 255f;
+            return ((float) ColorUtils.getRed(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
     }
@@ -33,7 +33,7 @@ public class RendererLivingEntityMixin {
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 1))
     private float getGreenTint(float f) {
         if (DamageTint.config.enabled) {
-            return ((float) ColorUtils.getGreen(DamageTintConfig.color.getRGB())) / 255f;
+            return ((float) ColorUtils.getGreen(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
     }
@@ -41,7 +41,7 @@ public class RendererLivingEntityMixin {
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 2))
     private float getBlueTint(float f) {
         if (DamageTint.config.enabled) {
-            return ((float) ColorUtils.getBlue(DamageTintConfig.color.getRGB())) / 255f;
+            return ((float) ColorUtils.getBlue(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
     }
@@ -52,9 +52,9 @@ public class RendererLivingEntityMixin {
             if (DamageTintConfig.fade) {
                 float percent = 1.0F - (float) damageTint$entitylivingbaseIn.hurtTime / (float) damageTint$entitylivingbaseIn.maxHurtTime;
                 percent = percent < 0.5F ? percent / 0.5F : (1.0F - percent) / 0.5F;
-                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getRGB()) * percent / 255.0F;
+                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getArgb()) * percent / 255.0F;
             } else {
-                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getRGB()) / 255.0F;
+                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getArgb()) / 255.0F;
             }
         }
         return f;

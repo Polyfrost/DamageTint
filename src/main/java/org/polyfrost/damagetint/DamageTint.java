@@ -1,10 +1,10 @@
 package org.polyfrost.damagetint;
 
-import cc.polyfrost.oneconfig.utils.commands.CommandManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import org.polyfrost.damagetint.command.DamageTintCommand;
 import org.polyfrost.damagetint.config.DamageTintConfig;
+import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 
 @Mod(name = DamageTint.NAME, version = DamageTint.VER, modid = DamageTint.ID)
 public class DamageTint {
@@ -14,7 +14,6 @@ public class DamageTint {
     @Mod.EventHandler
     protected void onInitialization(FMLInitializationEvent event) {
         config = new DamageTintConfig();
-        CommandManager.INSTANCE.registerCommand(new DamageTintCommand());
+        CommandManager.registerCommand(new DamageTintCommand());
     }
-
 }
