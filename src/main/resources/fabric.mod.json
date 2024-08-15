@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "name": "${name}",
+  "version": "${version}",
+  "description": "A mod which changes the color of entities that are hurt.",
+  "authors": [
+    "PolyFrost"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Polyfrost/DamageTint",
+    "sources": "https://github.com/Polyfrost/DamageTint",
+    "issues": "https://github.com/Polyfrost/DamageTint/issues"
+  },
+  "entrypoints": {
+    "client": [
+      {
+        "value": "org.polyfrost.damagetint.DamageTintFabric"
+      }
+    ]
+  },
+  "mixins": [
+    "mixins.${id}.json"
+  ],
+  "license": "LGPL 3.0",
+  "environment": "client"
+}
