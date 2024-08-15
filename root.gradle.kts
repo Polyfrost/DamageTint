@@ -5,5 +5,10 @@ plugins {
 }
 
 preprocess {
-    "1.8.9-forge"(10809, "srg") {}
+    strictExtraMappings.set(true)
+    val fabric10809 = createNode("1.8.9-fabric", 10809, "yarn")
+
+    val forge10809 = createNode("1.8.9-forge", 10809, "srg")
+
+    fabric10809.link(forge10809)
 }
