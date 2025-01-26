@@ -1,18 +1,18 @@
 [
-  {
-    "modid": "${id}",
-    "name": "${name}",
-    "description": "A mod which changes the color of entities that are hurt.",
-    "version": "${version}",
-    "mcversion": "${mcVersionStr}",
-    "url": "",
-    "updateUrl": "",
-    "authorList": [
-      "Polyfrost"
-    ],
-    "credits": "",
-    "logoFile": "",
-    "screenshots": [],
-    "dependencies": []
-  }
+    {
+        "modid": "${mod_id}",
+        "name": "${mod_name}",
+        "description": "A mod which changes the color of entities that are hurt.",
+        "version": "${mod_version}",
+        "mcversion": "${mc_version}",
+        "url": "",
+        "updateUrl": "",
+        "authorList": [
+            "Polyfrost"
+        ],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "dependencies": []
+    }
 ]
