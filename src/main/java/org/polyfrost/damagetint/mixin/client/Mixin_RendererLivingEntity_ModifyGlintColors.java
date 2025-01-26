@@ -1,10 +1,9 @@
-package org.polyfrost.damagetint.mixin;
+package org.polyfrost.damagetint.mixin.client;
 
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
-import org.polyfrost.damagetint.DamageTint;
-import org.polyfrost.damagetint.config.DamageTintConfig;
-import org.polyfrost.polyui.utils.ColorUtils;
+import org.polyfrost.damagetint.client.DamageTintConfig;
+import org.polyfrost.polyui.color.ColorUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RendererLivingEntity.class)
-public class RendererLivingEntityMixin {
+public class Mixin_RendererLivingEntity_ModifyGlintColors {
+
     @Unique
     private EntityLivingBase damageTint$entitylivingbaseIn;
 
@@ -24,7 +24,7 @@ public class RendererLivingEntityMixin {
 
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 0))
     private float getRedTint(float f) {
-        if (DamageTint.config.enabled) {
+        if (DamageTintConfig.INSTANCE.enabled) {
             return ((float) ColorUtils.getRed(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
@@ -32,7 +32,7 @@ public class RendererLivingEntityMixin {
 
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 1))
     private float getGreenTint(float f) {
-        if (DamageTint.config.enabled) {
+        if (DamageTintConfig.INSTANCE.enabled) {
             return ((float) ColorUtils.getGreen(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
@@ -40,7 +40,7 @@ public class RendererLivingEntityMixin {
 
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 2))
     private float getBlueTint(float f) {
-        if (DamageTint.config.enabled) {
+        if (DamageTintConfig.INSTANCE.enabled) {
             return ((float) ColorUtils.getBlue(DamageTintConfig.color.getArgb())) / 255f;
         }
         return f;
@@ -48,7 +48,7 @@ public class RendererLivingEntityMixin {
 
     @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 3))
     private float getAlphaTint(float f) {
-        if (DamageTint.config.enabled) {
+        if (DamageTintConfig.INSTANCE.enabled) {
             if (DamageTintConfig.fade) {
                 float percent = 1.0F - (float) damageTint$entitylivingbaseIn.hurtTime / (float) damageTint$entitylivingbaseIn.maxHurtTime;
                 percent = percent < 0.5F ? percent / 0.5F : (1.0F - percent) / 0.5F;
@@ -59,4 +59,5 @@ public class RendererLivingEntityMixin {
         }
         return f;
     }
+
 }
