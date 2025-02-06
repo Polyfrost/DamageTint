@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RendererLivingEntity.class)
-public class Mixin_RendererLivingEntity_ModifyGlintColors {
+public class Mixin_RendererLivingEntity_ModifyTintColors {
 
     @Unique
     private EntityLivingBase damageTint$entitylivingbaseIn;

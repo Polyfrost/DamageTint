@@ -18,7 +18,7 @@ public class DamageTintConfig extends Config {
 
     public static final DamageTintConfig INSTANCE = new DamageTintConfig();
 
-    private static final int defaultColor = java.awt.Color.GREEN.getRGB(); // 1291780096;
+    private static final int defaultColor = 1291780096;
 
     @Color(title = "Damage Tint Colour")
     public static PolyColor color = ColorUtils.toColor(defaultColor);
