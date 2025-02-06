@@ -31,7 +31,7 @@ public class DamageTintMixinPlugin implements IMixinConfigPlugin {
         //#if MC >= 1.16.5
         //$$ mixins.add("client.Mixin_OverlayTexture_SetColor");
         //#else
-        mixins.add("client.Mixin_RendererLivingEntity_ModifyGlintColors");
+        mixins.add("client.Mixin_RendererLivingEntity_ModifyTintColors");
         //#endif
 
         return mixins;
