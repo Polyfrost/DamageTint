@@ -3,7 +3,5 @@
     "minVersion": "0.7",
     "package": "org.polyfrost.damagetint.mixin",
     "refmap": "mixins.${mod_id}.refmap.json",
-    "client": [
-        "client.Mixin_RendererLivingEntity_ModifyGlintColors"
-    ]
+    "plugin": "org.polyfrost.damagetint.DamageTintMixinPlugin"
 }

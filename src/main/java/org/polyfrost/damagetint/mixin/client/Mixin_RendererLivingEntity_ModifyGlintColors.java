@@ -1,5 +1,6 @@
 package org.polyfrost.damagetint.mixin.client;
 
+//#if MC <= 1.12.2
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import org.polyfrost.damagetint.client.DamageTintConfig;
@@ -61,3 +62,4 @@ public class Mixin_RendererLivingEntity_ModifyGlintColors {
     }
 
 }
+//#endif
