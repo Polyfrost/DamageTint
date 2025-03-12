@@ -11,7 +11,7 @@ import org.polyfrost.oneconfig.utils.v1.dsl.ScreensKt;
  * @see org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command
  * @see DamageTintClient
  */
-@Command(value = DamageTintConstants.ID, description = "Access the " + DamageTintConstants.NAME + " GUI.")
+@Command(DamageTintConstants.ID)
 public class DamageTintCommand {
 
     @Command
