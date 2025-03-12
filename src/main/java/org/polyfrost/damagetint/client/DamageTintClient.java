@@ -13,7 +13,7 @@ public class DamageTintClient {
 
     public void initialize() {
         DamageTintConfig.INSTANCE.preload();
-        CommandManager.registerCommand(new DamageTintCommand());
+        CommandManager.register(new DamageTintCommand());
 
         //#if MC >= 1.16.5
         //$$ EventManager.register(InitializationEvent.class, () -> DamageTintConfig.updateOverlayColor(DamageTintConfig.color));
