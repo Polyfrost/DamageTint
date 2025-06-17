@@ -2,6 +2,7 @@ package org.polyfrost.damagetint.client;
 
 import org.polyfrost.damagetint.DamageTintConstants;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
+import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Handler;
 import org.polyfrost.oneconfig.utils.v1.dsl.ScreensKt;
 
 /**
@@ -14,7 +15,7 @@ import org.polyfrost.oneconfig.utils.v1.dsl.ScreensKt;
 @Command(DamageTintConstants.ID)
 public class DamageTintCommand {
 
-    @Command
+    @Handler
     private void main() {
         ScreensKt.openUI(DamageTintConfig.INSTANCE);
     }

@@ -1,10 +1,10 @@
 package org.polyfrost.damagetint.mixin.client;
 
 //#if MC >= 1.16.5
-//$$ import com.mojang.blaze3d.systems.RenderSystem;
-//$$ import net.minecraft.client.render.OverlayTexture;
-//$$ import net.minecraft.client.texture.NativeImage;
-//$$ import net.minecraft.client.texture.NativeImageBackedTexture;
+//$$ import com.mojang.blaze3d.platform.NativeImage;
+//$$ import dev.deftu.omnicore.client.render.OmniImage;
+//$$ import net.minecraft.client.renderer.texture.DynamicTexture;
+//$$ import net.minecraft.client.renderer.texture.OverlayTexture;
 //$$ import org.polyfrost.damagetint.client.utils.OverlayModifier;
 //$$ import org.spongepowered.asm.mixin.Final;
 //$$ import org.spongepowered.asm.mixin.Mixin;
@@ -15,32 +15,37 @@ package org.polyfrost.damagetint.mixin.client;
 //$$ public class Mixin_OverlayTexture_SetColor implements OverlayModifier {
 //$$
 //$$     @Shadow @Final
-//$$     private NativeImageBackedTexture texture;
+//$$     private DynamicTexture texture;
 //$$
 //$$     @Unique
 //$$     @Override
 //$$     public void setOverlayColor(int color) {
-//$$         NativeImage image = this.texture.getImage();
+//$$         NativeImage image = this.texture.getPixels();
 //$$         if (image == null) {
 //$$             throw new IllegalStateException("Overlay texture's image is null");
 //$$         }
 //$$
-//$$         NativeImage newImage = new NativeImage(image.getWidth(), image.getHeight(), false);
+//$$         OmniImage oldImage = OmniImage.from(image); // Allocate an OmniImage from the old image, which will be retained for pixel data
+//$$         OmniImage newImage = OmniImage.from(image); // This is our new image which we will modify and use for the texture
 //$$         for (int x = 0; x < newImage.getWidth(); x++) {
 //$$             for (int y = 0; y < newImage.getHeight(); y++) {
 //$$                 if (y < newImage.getHeight() / 2) {
-//$$                     newImage.setPixelColor(x, y, color);
+//$$                     // Set the top half of the image to the new color, overriding the original color
+//$$                     newImage.setPixel(x, y, color);
 //$$                 } else {
-//$$                     newImage.setPixelColor(x, y, image.getPixelColor(x, y));
+//$$                     // Keep the bottom half of the image unchanged. I can't remember why this is necessary, but it is, otherwise the overlay texture breaks completely
+//$$                     newImage.setPixel(x, y, oldImage.getPixel(x, y));
 //$$                 }
 //$$             }
 //$$         }
 //$$
-//$$         this.texture.setImage(newImage);
-//$$         RenderSystem.activeTexture(33985);
-//$$         this.texture.bindTexture();
-//$$         newImage.upload(0, 0, 0, 0, 0, newImage.getWidth(), newImage.getHeight(), false, true, false, false);
-//$$         RenderSystem.activeTexture(33984);
+//$$         oldImage.close(); // Close the old image to free resources. We were only using it for quick access to the original pixel data
+//$$
+//$$         // Now we can set the new image to the texture
+//$$         NativeImage nativeImage = newImage.getNative();
+//$$         this.texture.setPixels(nativeImage);
+//$$         this.texture.upload();
+//$$         nativeImage.close(); // Close the original image to free resources. No memory leaks here!
 //$$     }
 //$$
 //$$ }
