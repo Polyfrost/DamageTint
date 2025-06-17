@@ -9,8 +9,8 @@ import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 
 //#if MC >= 1.16.5
-//$$ import net.minecraft.client.MinecraftClient;
-//$$ import net.minecraft.client.render.OverlayTexture;
+//$$ import dev.deftu.omnicore.client.OmniClient;
+//$$ import net.minecraft.client.renderer.texture.OverlayTexture;
 //$$ import org.polyfrost.damagetint.client.utils.OverlayModifier;
 //#endif
 
@@ -45,7 +45,6 @@ public class DamageTintConfig extends Config {
 
         //#if MC >= 1.16.5
         //$$ addCallback("color", () -> {
-        //$$     System.out.println("addCallback(color): " + color);
         //$$     updateOverlayColor(color);
         //$$ });
         //#endif
@@ -53,7 +52,7 @@ public class DamageTintConfig extends Config {
 
     //#if MC >= 1.16.5
     //$$ public static void updateOverlayColor(PolyColor newColor) {
-    //$$     MinecraftClient.getInstance().execute(() -> {
+    //$$     OmniClient.execute(() -> {
     //$$         int red = newColor.red();
     //$$         int green = newColor.green();
     //$$         int blue = newColor.blue();
@@ -61,7 +60,7 @@ public class DamageTintConfig extends Config {
     //$$         int alpha = 255 - newColor.alpha();
     //$$         int abgr = alpha << 24 | blue << 16 | green << 8 | red;
     //$$
-    //$$         OverlayTexture overlayTexture = MinecraftClient.getInstance().gameRenderer.getOverlayTexture();
+    //$$         OverlayTexture overlayTexture = OmniClient.getInstance().gameRenderer.overlayTexture();
     //$$         ((OverlayModifier) overlayTexture).setOverlayColor(abgr);
     //$$     });
     //$$ }

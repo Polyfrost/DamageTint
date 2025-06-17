@@ -31,7 +31,7 @@ import org.polyfrost.damagetint.client.DamageTintClient;
 //$$ import org.polyfrost.damagetint.DamageTintConstants;
 //$$
 //#if MC >= 1.16.5
-//$$ @Mod(ExampleConstants.ID)
+//$$ @Mod(DamageTintConstants.ID)
 //#else
 @Mod(modid = DamageTintConstants.ID, version = DamageTintConstants.VERSION)
 //#endif
@@ -43,11 +43,11 @@ public class DamageTintEntrypoint
 {
 
     //#if FORGE && MC >= 1.16.5
-    //$$ public ExampleEntrypoint() {
+    //$$ public DamageTintEntrypoint() {
     //$$     setupForgeEvents(FMLJavaModLoadingContext.get().getModEventBus());
     //$$ }
     //#elseif NEOFORGE
-    //$$ public ExampleEntrypoint(IEventBus modEventBus) {
+    //$$ public DamageTintEntrypoint(IEventBus modEventBus) {
     //$$     setupForgeEvents(modEventBus);
     //$$ }
     //#endif
