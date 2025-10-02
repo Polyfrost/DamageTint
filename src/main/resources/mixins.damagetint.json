@@ -3,5 +3,7 @@
     "minVersion": "0.7",
     "package": "org.polyfrost.damagetint.mixin",
     "refmap": "mixins.${mod_id}.refmap.json",
-    "plugin": "org.polyfrost.damagetint.DamageTintMixinPlugin"
+    "client": [
+        "client.Mixin_ModifyTintColor"
+    ]
 }

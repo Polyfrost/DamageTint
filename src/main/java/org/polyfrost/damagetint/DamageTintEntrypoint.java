@@ -41,7 +41,6 @@ public class DamageTintEntrypoint
     //$$ implements ClientModInitializer
     //#endif
 {
-
     //#if FORGE && MC >= 1.16.5
     //$$ public DamageTintEntrypoint() {
     //$$     setupForgeEvents(FMLJavaModLoadingContext.get().getModEventBus());
@@ -86,5 +85,4 @@ public class DamageTintEntrypoint
     //$$     modEventBus.addListener(this::onInitializeClient);
     //$$ }
     //#endif
-
 }

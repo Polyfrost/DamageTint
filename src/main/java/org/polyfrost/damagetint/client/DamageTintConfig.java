@@ -9,14 +9,18 @@ import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 
 //#if MC >= 1.16.5
-//$$ import dev.deftu.omnicore.client.OmniClient;
+//$$ import dev.deftu.omnicore.api.color.OmniColor;
+//$$ import dev.deftu.omnicore.api.client.OmniClient;
+//$$ import dev.deftu.omnicore.api.client.OmniClientRuntime;
 //$$ import net.minecraft.client.renderer.texture.OverlayTexture;
 //$$ import org.polyfrost.damagetint.client.utils.OverlayModifier;
 //#endif
 
 public class DamageTintConfig extends Config {
-
     public static final DamageTintConfig INSTANCE = new DamageTintConfig();
+
+    @Switch(title = "Enable Damage Tint")
+    public static boolean enabled = true;
 
     private static final int defaultColor = 1291780096;
 
@@ -25,7 +29,7 @@ public class DamageTintConfig extends Config {
 
     @Button(title = "Reset Damage Tint", text = "Reset Color")
     private void resetColor() {
-        color = ColorUtils.mutable(ColorUtils.toColor(defaultColor));
+        color = ColorUtils.asMutable(ColorUtils.toColor(defaultColor));
         save();
     }
 
@@ -40,7 +44,7 @@ public class DamageTintConfig extends Config {
     public static boolean fade = false;
 
     public DamageTintConfig() {
-        super("damagetint.json", "/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
+        super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
         save();
 
         //#if MC >= 1.16.5
@@ -52,18 +56,17 @@ public class DamageTintConfig extends Config {
 
     //#if MC >= 1.16.5
     //$$ public static void updateOverlayColor(PolyColor newColor) {
-    //$$     OmniClient.execute(() -> {
+    //$$     OmniClientRuntime.runOnMain(() -> {
     //$$         int red = newColor.red();
     //$$         int green = newColor.green();
     //$$         int blue = newColor.blue();
     //$$         // Alpha is flipped for some reason, so 0 is fully opaque and 255 is fully transparent... Why, Mojang?
     //$$         int alpha = 255 - newColor.alpha();
-    //$$         int abgr = alpha << 24 | blue << 16 | green << 8 | red;
+    //$$         OmniColor color = new OmniColor(red, green, blue, alpha);
     //$$
-    //$$         OverlayTexture overlayTexture = OmniClient.getInstance().gameRenderer.overlayTexture();
-    //$$         ((OverlayModifier) overlayTexture).setOverlayColor(abgr);
+    //$$         OverlayTexture overlayTexture = OmniClient.get().gameRenderer.overlayTexture();
+    //$$         ((OverlayModifier) overlayTexture).setOverlayColor(color);
     //$$     });
     //$$ }
     //#endif
-
 }
