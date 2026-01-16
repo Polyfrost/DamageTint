@@ -20,7 +20,7 @@
         ]
     },
     "mixins": [
-        "mixins.${mod_id}.json"
+        "mixins.damagetint.json"
     ],
     "license": "LGPL 3.0",
     "environment": "client"
