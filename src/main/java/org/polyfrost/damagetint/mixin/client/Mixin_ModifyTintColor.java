@@ -1,64 +1,54 @@
 package org.polyfrost.damagetint.mixin.client;
 
-import net.minecraft.client.renderer.entity.RendererLivingEntity;
-import net.minecraft.entity.EntityLivingBase;
-import org.polyfrost.damagetint.client.DamageTintConfig;
-import org.polyfrost.polyui.color.ColorUtils;
+import com.mojang.blaze3d.platform.NativeImage;
+import dev.deftu.omnicore.api.client.image.OmniImage;
+import dev.deftu.omnicore.api.client.image.OmniImages;
+import dev.deftu.omnicore.api.color.OmniColor;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import org.polyfrost.damagetint.client.DamageTintClient;
+import org.polyfrost.damagetint.client.utils.OverlayModifier;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(RendererLivingEntity.class)
-public class Mixin_ModifyTintColor {
-    @Unique private EntityLivingBase damageTint$entitylivingbaseIn;
+@Mixin(OverlayTexture.class)
+public class Mixin_ModifyTintColor implements OverlayModifier {
 
-    @Inject(method = "setBrightness", at = @At("HEAD"))
-    private void set(EntityLivingBase entitylivingbaseIn, float partialTicks, boolean combineTextures, CallbackInfoReturnable<Boolean> cir) {
-        damageTint$entitylivingbaseIn = entitylivingbaseIn;
-    }
+    @Shadow
+    @Final
+    private DynamicTexture texture;
 
-    @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 0))
-    private float getRedTint(float f) {
-        if (DamageTintConfig.enabled) {
-            return ((float) ColorUtils.getRed(DamageTintConfig.color.getArgb())) / 255f;
+    @Override
+    @Unique
+    public void damageTint$setOverlayColor(OmniColor color) {
+        NativeImage image = this.texture.getPixels();
+        if (image == null) {
+            throw new IllegalStateException("Overlay texture's image is null");
         }
 
-        return f;
-    }
+        OmniImage oldImage = OmniImages.from(image);
+        OmniImage newImage = OmniImages.from(image);
+        DamageTintClient.INSTANCE.LOGGER.info("updateOverlayColor called in mixin");
 
-    @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 1))
-    private float getGreenTint(float f) {
-        if (DamageTintConfig.enabled) {
-            return ((float) ColorUtils.getGreen(DamageTintConfig.color.getArgb())) / 255f;
-        }
-
-        return f;
-    }
-
-    @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 2))
-    private float getBlueTint(float f) {
-        if (DamageTintConfig.enabled) {
-            return ((float) ColorUtils.getBlue(DamageTintConfig.color.getArgb())) / 255f;
-        }
-
-        return f;
-    }
-
-    @ModifyArg(method = "setBrightness", at = @At(value = "INVOKE", target = "Ljava/nio/FloatBuffer;put(F)Ljava/nio/FloatBuffer;", ordinal = 3))
-    private float getAlphaTint(float f) {
-        if (DamageTintConfig.enabled) {
-            if (DamageTintConfig.fade) {
-                float percent = 1.0F - (float) damageTint$entitylivingbaseIn.hurtTime / (float) damageTint$entitylivingbaseIn.maxHurtTime;
-                percent = percent < 0.5F ? percent / 0.5F : (1.0F - percent) / 0.5F;
-                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getArgb()) * percent / 255.0F;
-            } else {
-                return (float) ColorUtils.getAlpha(DamageTintConfig.color.getArgb()) / 255.0F;
+        for (int x = 0; x < newImage.getWidth(); x++) {
+            for (int y = 0; y < newImage.getHeight(); y++) {
+                if (y < newImage.getHeight() / 2) {
+                    newImage.set(x, y, color);
+                } else {
+                    newImage.set(x, y, oldImage.get(x, y));
+                }
             }
         }
 
-        return f;
+        try {
+            oldImage.close();
+        } catch (Throwable ignored) {}
+
+        NativeImage nativeImage = newImage.getNative();
+        this.texture.setPixels(nativeImage);
+        this.texture.upload();
+        image.close();
     }
 }
