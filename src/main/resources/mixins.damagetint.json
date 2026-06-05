@@ -4,6 +4,7 @@
     "package": "org.polyfrost.damagetint.mixin",
     "refmap": "mixins.${mod_id}.refmap.json",
     "client": [
-        "client.Mixin_ModifyTintColor"
+        "client.Mixin_ModifyTintColor",
+        "client.Mixin_LivingEntityRenderer"
     ]
 }
