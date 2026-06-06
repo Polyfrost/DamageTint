@@ -69,9 +69,7 @@ dependencies {
             }
         })
     } else {
-        findProperty("yarn_mappings")?.toString()?.takeUnless { it.isBlank() }?.let {
-            mappings("net.fabricmc:yarn:$it:v2")
-        } ?: findProperty("mappings_version")?.toString()?.takeUnless { it.isBlank() }?.let {
+         findProperty("mappings_version")?.toString()?.takeUnless { it.isBlank() }?.let {
             mappings(it)
         }
     }
