@@ -52,14 +52,6 @@ loom {
 
     runConfigs.remove(runConfigs["server"]) // Removes server run configs
 }
-configurations.all {
-    resolutionStrategy {
-        // fabric-loader 0.18.4 bundles sponge-mixin 0.17.0, which lacks IAdviceProvider.
-        // OneConfig alpha.191 was compiled against 0.17.2 which added that class.
-        // Force the newer version to avoid NoClassDefFoundError at runtime.
-        force("net.fabricmc:sponge-mixin:0.17.2+mixin.0.8.7")
-    }
-}
 
 dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
