@@ -52,9 +52,18 @@ loom {
 
     runConfigs.remove(runConfigs["server"]) // Removes server run configs
 }
+configurations.all {
+    resolutionStrategy {
+        // fabric-loader 0.18.4 bundles sponge-mixin 0.17.0, which lacks IAdviceProvider.
+        // OneConfig alpha.191 was compiled against 0.17.2 which added that class.
+        // Force the newer version to avoid NoClassDefFoundError at runtime.
+        force("net.fabricmc:sponge-mixin:0.17.2+mixin.0.8.7")
+    }
+}
 
 dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
+
     val hasOfficialMappings = findProperty("has_official_mappings")?.toString()?.toBoolean() ?: true
     if (hasOfficialMappings) {
         @Suppress("UnstableApiUsage")
@@ -75,15 +84,15 @@ dependencies {
         }
     }
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
-    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:commands:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:config:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:config-impl:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:events:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.191")
-    implementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.191")
+    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:commands:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:config:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:config-impl:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:events:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.192")
+    implementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.192")
 }
 
 bloom {
