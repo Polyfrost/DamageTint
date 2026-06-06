@@ -1,12 +1,8 @@
 package org.polyfrost.damagetint.mixin.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import dev.deftu.omnicore.api.client.image.OmniImage;
-import dev.deftu.omnicore.api.client.image.OmniImages;
-import dev.deftu.omnicore.api.color.OmniColor;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import org.polyfrost.damagetint.client.DamageTintClient;
 import org.polyfrost.damagetint.client.utils.OverlayModifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,33 +18,30 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
 
     @Override
     @Unique
-    public void damageTint$setOverlayColor(OmniColor color) {
+    public void damageTint$setOverlayColor(int a, int r, int g, int b) {
         NativeImage image = this.texture.getPixels();
         if (image == null) {
             throw new IllegalStateException("Overlay texture's image is null");
         }
 
-        OmniImage oldImage = OmniImages.from(image);
-        OmniImage newImage = OmniImages.from(image);
-        DamageTintClient.INSTANCE.LOGGER.info("updateOverlayColor called in mixin");
+        for (int y = 0; y < image.getHeight() / 2; y++) {
+            float percent = 1.0f - ((float) y / 7.0f);
+            int currentAlpha = (int) (255 - ((255 - a) * percent));
+            //? if >=1.21.4 {
+            int packedColor = (currentAlpha << 24 | r << 16 | g << 8 | b);
+            //?} else {
+            /*int packedColor = (currentAlpha << 24 | b << 16 | g << 8 | r);
+            *///?}
 
-        for (int x = 0; x < newImage.getWidth(); x++) {
-            for (int y = 0; y < newImage.getHeight(); y++) {
-                if (y < newImage.getHeight() / 2) {
-                    newImage.set(x, y, color);
-                } else {
-                    newImage.set(x, y, oldImage.get(x, y));
-                }
+            for (int x = 0; x < image.getWidth(); x++) {
+                //? if >=1.21.4 {
+                image.setPixel(x, y, packedColor);
+                //?} else {
+                /*image.setPixelRGBA(x, y, packedColor);
+                *///?}
             }
         }
 
-        try {
-            oldImage.close();
-        } catch (Throwable ignored) {}
-
-        NativeImage nativeImage = newImage.getNative();
-        this.texture.setPixels(nativeImage);
         this.texture.upload();
-        image.close();
     }
 }
