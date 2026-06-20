@@ -5,15 +5,18 @@ plugins {
     id("dev.kikugie.loom-back-compat")
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("dev.deftu.gradle.bloom") version "0.2.0"
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 }
 
-val modid = property("mod.id")
-val modname = property("mod.name")
-val modversion = property("mod.version")
-val mcversion = property("minecraft_version")
+val modid = property("mod.id") as String
+val modname = property("mod.name") as String
+val modversion = property("mod.version") as String
+val mcversion = property("minecraft_version") as String
+val versionrange = property("minecraft_version_range")
+val loaderversion = property("loader_version")
 
 base {
-    archivesName.set(property("mod.id") as String)
+    archivesName.set("$modid-$modversion+$mcversion")
 }
 
 repositories {
@@ -96,8 +99,8 @@ tasks.processResources {
         "mod_id" to modid,
         "mod_name" to modname,
         "mod_version" to modversion,
-        "mc_version" to mcversion,
-        "loader_version" to providers.gradleProperty("loader_version").get()
+        "minecraft_version_range" to versionrange,
+        "loader_version" to loaderversion
     )
 
     inputs.properties(props)
@@ -144,3 +147,59 @@ tasks.jar {
 
 fun <T> optionalProp(property: String, block: (String) -> T?): T? =
     findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
+
+
+val modrinthMinecraftVersionOverride = mapOf(
+    "26.1" to listOf("26.1", "26.1.1", "26.1.2"),
+    "26.1.1" to listOf("26.1", "26.1.1", "26.1.2"),
+    "26.1.2" to listOf("26.1", "26.1.1", "26.1.2")
+)
+
+val modrinthId = listOf("oneconfig.publish.modrinth", "publish.modrinth").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
+val modrinthToken = listOf("oneconfig.publish.modrinth.token", "publish.modrinth.token", "modrinth.token").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
+val minecraftVersion = modrinthMinecraftVersionOverride[mcversion] ?: listOf(mcversion)
+val publishJarTaskName = if ("remapJar" in tasks.names) "remapJar" else "jar"
+val changelogs = rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
+
+val validateChangelog by tasks.registering {
+    description = "Validates that the changelog is written for the current version."
+    if (!changelogs.contains(modversion)) {
+        throw GradleException("Changelog for version $modversion not found.")
+    }
+}
+
+tasks.publishMods.configure {
+    dependsOn(validateChangelog)
+}
+tasks.matching { it.name == "publishModrinth" }.configureEach {
+    dependsOn(validateChangelog)
+}
+
+publishMods {
+    file = tasks.named<AbstractArchiveTask>(publishJarTaskName).flatMap { it.archiveFile }
+
+    displayName = modversion
+    version = "v$modversion"
+    changelog = changelogs
+    type = BETA
+
+    modLoaders.add("fabric")
+
+    dryRun = modrinthId == null || modrinthToken == null
+
+    if (modrinthId != null) {
+        modrinth {
+            projectId = modrinthId
+            accessToken = modrinthToken.orEmpty()
+
+            minecraftVersions.addAll(minecraftVersion)
+
+            requires("oneconfig")
+            requires("fabric-language-kotlin")
+            findProperty("publish.modrinth.compose-bundle")
+                ?.toString()
+                ?.takeIf { it.isNotBlank() }
+                ?.let { requires(it) }
+        }
+    }
+}
