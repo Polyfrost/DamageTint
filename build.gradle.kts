@@ -23,34 +23,38 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     google()
-
-    maven("https://maven.parchmentmc.org")
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
-    maven("https://maven.gegy.dev/releases")
+    maven("https://maven.parchmentmc.org") {
+        content {
+            includeGroupAndSubgroups("org.parchmentmc")
+        }
+    }
+    maven("https://maven.gegy.dev/releases") {
+        content {
+            includeGroup("dev.lambdaurora")
+        }
+    }
     maven("https://maven.terraformersmc.com/releases") {
-        content { includeGroup("com.terraformersmc") }
+        content {
+            includeGroup("com.terraformersmc")
+        }
     }
     maven("https://central.sonatype.com/repository/maven-snapshots/") {
-        content { includeGroup("net.kyori") }
+        content {
+            includeGroup("net.kyori")
+        }
     }
-
-    maven("https://maven.logix.dev/snapshots")
-    maven("https://nexus.prsm.wtf/repository/maven-public/maven-repo/releases/")
-    maven("https://repo.hypixel.net/repository/Hypixel/")
-    maven("https://maven.deftu.dev/releases")
-
-    maven("https://maven.fabricmc.net/releases")
-    maven("https://jitpack.io") {
-        content { includeGroupAndSubgroups("com.github") }
+    maven("https://maven.deftu.dev/releases") {
+        content {
+            includeGroup("dev.deftu")
+        }
     }
-    maven("https://maven.bawnorton.com/releases") {
-        content { includeGroup("com.github.bawnorton.mixinsquared") }
+    maven("https://maven.fabricmc.net/releases") {
+        content {
+            includeGroup("net.fabricmc")
+        }
     }
-    maven("https://maven.azureaaron.net/releases") {
-        content { includeGroup("net.azureaaron") }
-    }
-    maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 
 loom {
