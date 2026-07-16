@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("dev.kikugie.loom-back-compat")
-    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("org.jetbrains.kotlin.jvm") version "2.4.0"
     id("dev.deftu.gradle.bloom") version "0.2.0"
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 }
@@ -28,6 +28,12 @@ repositories {
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
     maven("https://maven.gegy.dev/releases")
+    maven("https://maven.terraformersmc.com/releases") {
+        content { includeGroup("com.terraformersmc") }
+    }
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
+        content { includeGroup("net.kyori") }
+    }
 
     maven("https://maven.logix.dev/snapshots")
     maven("https://nexus.prsm.wtf/repository/maven-public/maven-repo/releases/")
@@ -64,10 +70,10 @@ dependencies {
         @Suppress("UnstableApiUsage")
         mappings(loom.layered {
             officialMojangMappings()
-            optionalProp("${property("parchment_version")}") {
+            optionalProp("parchment_version") {
                 parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
             }
-            optionalProp("${property("yalmm_version")}") {
+            optionalProp("yalmm_version") {
                 mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
             }
         })
@@ -76,16 +82,17 @@ dependencies {
             mappings(it)
         }
     }
+    val oneconfigversion = property("oneconfig_version") as String
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
-    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:commands:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:config:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:config-impl:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:events:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.192")
-    implementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.192")
+    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:commands:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:config:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:config-impl:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:events:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:internal:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:ui:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:utils:$oneconfigversion")
+    implementation("org.polyfrost.oneconfig:hud:$oneconfigversion")
 }
 
 bloom {
