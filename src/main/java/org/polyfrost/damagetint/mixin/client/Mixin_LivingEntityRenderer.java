@@ -42,11 +42,18 @@ public class Mixin_LivingEntityRenderer {
             int hurtTime = hurtTimeObj != null ? hurtTimeObj : 0;
             int deathTime = deathTimeObj != null ? deathTimeObj : 0;
 
-            if (hurtTime > 0) {
-                int row = Math.round((1.0f - (float) hurtTime / 10.0f) * 7.0f);
+            if (deathTime > 0) {
+                if (DamageTintConfig.fadeDeath) {
+                    int row = Math.round(((float) deathTime / DamageTintConfig.fadeDuration) * 7.0f);
+                    row = Math.max(0, Math.min(7, row));
+                    cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), row));
+                } else {
+                    cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), 0));
+                }
+            } else if (hurtTime > 0) {
+                int row = Math.round((1.0f - (float) hurtTime / DamageTintConfig.fadeDuration) * 7.0f);
+                row = Math.max(0, Math.min(7, row));
                 cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), row));
-            } else if (deathTime > 0) {
-                cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), 0));
             }
         }
     }
@@ -58,11 +65,18 @@ public class Mixin_LivingEntityRenderer {
             int hurtTime = entity.hurtTime;
             int deathTime = entity.deathTime;
 
-            if (hurtTime > 0) {
-                int row = Math.round((1.0f - (float) hurtTime / 10.0f) * 7.0f);
+            if (deathTime > 0) {
+                if (DamageTintConfig.fadeDeath) {
+                    int row = Math.round(((float) deathTime / DamageTintConfig.fadeDuration) * 7.0f);
+                    row = Math.max(0, Math.min(7, row));
+                    cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), row));
+                } else {
+                    cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), 0));
+                }
+            } else if (hurtTime > 0) {
+                int row = Math.round((1.0f - (float) hurtTime / DamageTintConfig.fadeDuration) * 7.0f);
+                row = Math.max(0, Math.min(7, row));
                 cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), row));
-            } else if (deathTime > 0) {
-                cir.setReturnValue(OverlayTexture.pack(OverlayTexture.u(f), 0));
             }
         }
     }

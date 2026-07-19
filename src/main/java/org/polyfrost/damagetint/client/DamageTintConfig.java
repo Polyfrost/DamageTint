@@ -7,6 +7,7 @@ import org.polyfrost.damagetint.DamageTintConstants;
 import org.polyfrost.damagetint.client.utils.OverlayModifier;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Color;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Slider;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch;
 
 public class DamageTintConfig extends Config {
@@ -23,6 +24,12 @@ public class DamageTintConfig extends Config {
 
     @Switch(title = "Fade Out Damage Tint")
     public static boolean fade = false;
+
+    @Slider(title = "Fade Duration (ticks)", min = 1, max = 10, step = 1)
+    public static float fadeDuration = 10;
+
+    @Switch(title = "Fade Out Dead Entities")
+    public static boolean fadeDeath = false;
 
     public DamageTintConfig() {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
