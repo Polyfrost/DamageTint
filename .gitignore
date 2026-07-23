@@ -21,3 +21,5 @@ gradle-app.setting
 
 # Minecraft
 **/run/
+**/.fabric/
+versions/*/logs/

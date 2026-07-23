@@ -1,4 +1,5 @@
 {
+    "required": true,
     "compatibilityLevel": "JAVA_21",
     "minVersion": "0.7",
     "package": "org.polyfrost.damagetint.mixin",
@@ -6,5 +7,8 @@
     "client": [
         "client.Mixin_ModifyTintColor",
         "client.Mixin_LivingEntityRenderer"
-    ]
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
 }

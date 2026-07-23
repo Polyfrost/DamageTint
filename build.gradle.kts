@@ -98,6 +98,13 @@ dependencies {
     implementation("org.polyfrost.oneconfig:ui:$oneconfigversion")
     implementation("org.polyfrost.oneconfig:utils:$oneconfigversion")
     implementation("org.polyfrost.oneconfig:hud:$oneconfigversion")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
+    testImplementation("net.fabricmc:fabric-loader-junit:${property("loader_version")}")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 bloom {
