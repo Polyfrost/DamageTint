@@ -43,12 +43,12 @@ public class DamageTintConfig extends Config {
 
     public static void updateOverlayColor(PolyColor newColor) {
        Minecraft.getInstance().execute(() -> {
-            PolyColor overlayColor = enabled ? newColor : new PolyColor(defaultColor);
-            int r = overlayColor.getRed();
-            int g = overlayColor.getGreen();
-            int b = overlayColor.getBlue();
+            int argb = enabled ? newColor.getArgb() : defaultColor;
+            int r = argb >> 16 & 0xFF;
+            int g = argb >> 8 & 0xFF;
+            int b = argb & 0xFF;
             // Alpha is flipped for some reason, so 0 is fully opaque and 255 is fully transparent... Why, Mojang? Other developer note: 😭😭😭😭😭
-            int a = 255 - overlayColor.getAlpha();
+            int a = 255 - (argb >>> 24);
 
             OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
             ((OverlayModifier)overlayTexture).damageTint$setOverlayColor(a, r, g, b, enabled && fade);
