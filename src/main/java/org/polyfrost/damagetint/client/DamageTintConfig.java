@@ -17,7 +17,7 @@ public class DamageTintConfig extends Config {
     @Switch(title = "Enable Damage Tint")
     public static boolean enabled = true;
 
-    private static final int defaultColor = 1291780096;
+    private static final int defaultColor = 0x4DFF0000;
 
     @Color(title = "Damage Tint Color")
     public static PolyColor color = new PolyColor(defaultColor);
