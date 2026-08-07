@@ -1,0 +1,22 @@
+tiny	2	0	intermediary	named
+c	net/minecraft/client/Minecraft	net/minecraft/client/Minecraft
+	f	Lnet/minecraft/unmapped/C_34399650;	f_26407825	level
+c	net/minecraft/unmapped/C_32220415	net/minecraft/server/Bootstrap
+c	net/minecraft/unmapped/C_34399650	net/minecraft/client/multiplayer/ClientLevel
+c	net/minecraft/unmapped/C_64041439	net/minecraft/world/level/Level
+c	net/minecraft/unmapped/C_83334639	net/minecraft/world/damagesource/DamageSource
+c	net/minecraft/unmapped/C_42232651	net/minecraft/world/entity/Entity
+	f	I	f_41909716	tickCount
+c	net/minecraft/unmapped/C_74425583	net/minecraft/world/entity/LivingEntity
+	f	I	f_51635995	hurtTime
+	f	I	f_74213954	deathTime
+c	net/minecraft/unmapped/C_71252617	net/minecraft/client/renderer/entity/LivingEntityRenderer
+c	net/minecraft/unmapped/C_88014908	net/minecraft/client/multiplayer/ClientPacketListener
+c	net/minecraft/unmapped/C_23730550	net/minecraft/client/multiplayer/ClientPacketHandler
+	m	(Lnet/minecraft/unmapped/C_44929569;)V	m_24969148	handleAnimate
+c	net/minecraft/unmapped/C_44929569	net/minecraft/network/protocol/game/ClientboundAnimatePacket
+c	net/minecraft/unmapped/C_11134548	net/minecraft/network/protocol/game/ClientboundEntityEventPacket
+c	net/minecraft/unmapped/C_57049179	net/minecraft/client/renderer/entity/EnderDragonRenderer
+c	net/minecraft/unmapped/C_83946278	net/minecraft/world/entity/boss/enderdragon/EnderDragon
+c	net/minecraft/unmapped/C_23805538	net/minecraft/world/entity/boss/EnderDragonPart
+c	net/minecraft/unmapped/C_72633554	net/minecraft/world/entity/boss/enderdragon/EnderDragonHost
