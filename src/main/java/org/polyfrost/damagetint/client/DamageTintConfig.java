@@ -6,21 +6,23 @@ import org.polyfrost.compose.render.PolyColor;
 import org.polyfrost.damagetint.DamageTintConstants;
 import org.polyfrost.damagetint.client.utils.OverlayModifier;
 import org.polyfrost.oneconfig.api.config.v1.Config;
+import org.polyfrost.oneconfig.api.config.v1.ConfigManager;
+import org.polyfrost.oneconfig.api.config.v1.Tree;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Color;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch;
+import org.polyfrost.oneconfig.api.config.v1.serialize.adapter.impl.PolyColorAdapter;
 
 public class DamageTintConfig extends Config {
-
-    public static final DamageTintConfig INSTANCE = new DamageTintConfig();
 
     @Switch(title = "Enable Damage Tint")
     public static boolean enabled = true;
 
     private static final int defaultColor = 0x4DFF0000;
+    private static final int legacyDefaultColor = 1291780096;
 
     @Color(title = "Damage Tint Color")
-    public static PolyColor color = new PolyColor(defaultColor);
+    public static PolyColor colorV2 = new PolyColor(defaultColor);
 
     @Switch(title = "Fade Out Damage Tint")
     public static boolean fade = false;
@@ -31,13 +33,23 @@ public class DamageTintConfig extends Config {
     @Switch(title = "Fade Out Dead Entities")
     public static boolean fadeDeath = false;
 
+    public static final DamageTintConfig INSTANCE = new DamageTintConfig();
+
     public DamageTintConfig() {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
-        addCallback("enabled", () -> updateOverlayColor(color));
-        addCallback("color", (() -> {
-            updateOverlayColor(color);
+
+        Tree oldConfig = ConfigManager.active().load(id);
+        PolyColor oldColor = oldConfig == null || oldConfig.getProp("color") == null ? null
+                : new PolyColorAdapter().deserialize(oldConfig.getProp("color").get());
+
+        addCallback("enabled", () -> updateOverlayColor(colorV2));
+        addCallback("colorV2", (() -> {
+            updateOverlayColor(colorV2);
         }));
-        addCallback("fade", () -> updateOverlayColor(color));
+        addCallback("fade", () -> updateOverlayColor(colorV2));
+        if (oldColor != null && (oldColor.getChroma() || oldColor.getArgb() != legacyDefaultColor)) {
+            colorV2 = oldColor;
+        }
         save();
     }
 

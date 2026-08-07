@@ -16,12 +16,12 @@ public class DamageTintClient {
 
     public void initialize() {
         DamageTintConfig.INSTANCE.preload();
-        EventManager.register(InitializationEvent.class, () -> DamageTintConfig.updateOverlayColor(DamageTintConfig.color));
+        EventManager.register(InitializationEvent.class, () -> DamageTintConfig.updateOverlayColor(DamageTintConfig.colorV2));
         EventManager.register(FramebufferRenderEvent.Start.class, this::updateChroma);
     }
 
     private void updateChroma() {
-        if (!DamageTintConfig.enabled || !DamageTintConfig.color.getChroma()) {
+        if (!DamageTintConfig.enabled || !DamageTintConfig.colorV2.getChroma()) {
             lastChromaTime = 0L;
             return;
         }
@@ -32,6 +32,6 @@ public class DamageTintClient {
         }
 
         lastChromaTime = now;
-        DamageTintConfig.updateOverlayColor(DamageTintConfig.color);
+        DamageTintConfig.updateOverlayColor(DamageTintConfig.colorV2);
     }
 }
