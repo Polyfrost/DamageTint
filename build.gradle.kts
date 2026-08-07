@@ -54,6 +54,7 @@ repositories {
             includeGroup("io.github.moehreag.legacy-lwjgl3")
         }
     }
+    maven("https://repo.saadndm.com/releases")
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
     maven("https://api.modrinth.com/maven") {
