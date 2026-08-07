@@ -36,7 +36,7 @@ repositories {
             includeGroup("dev.lambdaurora")
         }
     }
-    //maven("https://maven.terraformersmc.com/releases") {
+    maven("https://maven.terraformersmc.com/") {
     maven("https://maven.gnomecraft.net/releases/") {
         content {
             includeGroup("com.terraformersmc")
