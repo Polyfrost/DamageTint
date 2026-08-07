@@ -1,7 +1,12 @@
 package org.polyfrost.damagetint.test;
 
-import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
+//? if > 1.8.9
+import net.minecraft.SharedConstants;
+//? if = 1.8.9 {
+//import net.fabricmc.loader.api.FabricLoader;
+//import net.ornithemc.osl.entrypoints.api.ModInitializer;
+//?}
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +28,17 @@ public class MixinTest {
 
     @BeforeAll
     public static void setupEnvironment() {
+        //? if > 1.8.9 {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        //?} else {
+        /*FabricLoader.getInstance().invokeEntrypoints(
+                ModInitializer.ENTRYPOINT_KEY,
+                ModInitializer.class,
+                ModInitializer::init
+        );
+        Bootstrap.init();
+        *///?}
     }
 
     @Test
