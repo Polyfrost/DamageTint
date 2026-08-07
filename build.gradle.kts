@@ -37,7 +37,6 @@ repositories {
         }
     }
     maven("https://maven.terraformersmc.com/") {
-    maven("https://maven.gnomecraft.net/releases/") {
         content {
             includeGroup("com.terraformersmc")
         }
