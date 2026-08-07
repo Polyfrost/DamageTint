@@ -36,6 +36,7 @@ public class DamageTintConfig extends Config {
         addCallback("color", (() -> {
             updateOverlayColor(color);
         }));
+        addCallback("fade", () -> updateOverlayColor(color));
         save();
     }
 
@@ -48,7 +49,7 @@ public class DamageTintConfig extends Config {
             int a = 255 - newColor.getAlpha();
 
             OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
-            ((OverlayModifier)overlayTexture).damageTint$setOverlayColor(a, r, g, b);
+            ((OverlayModifier)overlayTexture).damageTint$setOverlayColor(a, r, g, b, fade);
         });
     }
 }

@@ -18,14 +18,14 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
 
     @Override
     @Unique
-    public void damageTint$setOverlayColor(int a, int r, int g, int b) {
+    public void damageTint$setOverlayColor(int a, int r, int g, int b, boolean fade) {
         NativeImage image = this.texture.getPixels();
         if (image == null) {
             throw new IllegalStateException("Overlay texture's image is null");
         }
 
         for (int y = 0; y < image.getHeight() / 2; y++) {
-            float percent = 1.0f - ((float) y / 7.0f);
+            float percent = fade ? 1.0f - ((float) y / 7.0f) : 1.0f;
             int currentAlpha = (int) (255 - ((255 - a) * percent));
             //? if >=1.21.4 {
             int packedColor = (currentAlpha << 24 | r << 16 | g << 8 | b);
