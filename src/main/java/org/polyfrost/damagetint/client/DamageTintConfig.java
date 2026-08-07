@@ -33,6 +33,7 @@ public class DamageTintConfig extends Config {
 
     public DamageTintConfig() {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
+        addCallback("enabled", () -> updateOverlayColor(color));
         addCallback("color", (() -> {
             updateOverlayColor(color);
         }));
@@ -42,14 +43,15 @@ public class DamageTintConfig extends Config {
 
     public static void updateOverlayColor(PolyColor newColor) {
        Minecraft.getInstance().execute(() -> {
-            int r = newColor.getRed();
-            int g = newColor.getGreen();
-            int b = newColor.getBlue();
+            PolyColor overlayColor = enabled ? newColor : new PolyColor(defaultColor);
+            int r = overlayColor.getRed();
+            int g = overlayColor.getGreen();
+            int b = overlayColor.getBlue();
             // Alpha is flipped for some reason, so 0 is fully opaque and 255 is fully transparent... Why, Mojang? Other developer note: 😭😭😭😭😭
-            int a = 255 - newColor.getAlpha();
+            int a = 255 - overlayColor.getAlpha();
 
             OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
-            ((OverlayModifier)overlayTexture).damageTint$setOverlayColor(a, r, g, b, fade);
+            ((OverlayModifier)overlayTexture).damageTint$setOverlayColor(a, r, g, b, enabled && fade);
         });
     }
 }
