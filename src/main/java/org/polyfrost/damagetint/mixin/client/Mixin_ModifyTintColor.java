@@ -1,5 +1,6 @@
 package org.polyfrost.damagetint.mixin.client;
 
+//? if > 1.8.9 {
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -45,3 +46,10 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
         this.texture.upload();
     }
 }
+//?} else {
+/*import net.minecraft.SharedConstants;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(SharedConstants.class)
+public class Mixin_ModifyTintColor {}
+*///?}

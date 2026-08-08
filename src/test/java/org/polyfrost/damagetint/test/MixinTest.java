@@ -1,5 +1,6 @@
 package org.polyfrost.damagetint.test;
 
+//? if > 1.8.9
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.Assertions;
@@ -18,8 +19,11 @@ public class MixinTest {
 
     @BeforeAll
     public static void setupEnvironment() {
+        //? if > 1.8.9 {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        //?} else
+        //Bootstrap.init();
     }
 
     @Test
