@@ -19,10 +19,12 @@ public class Mixin_LivingEntity implements DamageVariantHolder {
     @Unique
     private int damageTint$hurtTick;
 
+    //? if >1.8.9 {
     @Inject(method = "handleDamageEvent", at = @At("HEAD"))
     private void damageTint$recordDamageVariant(DamageSource source, CallbackInfo ci) {
         DamageVariantTracker.record((LivingEntity) (Object) this, source);
     }
+    //?}
 
     @Override
     public DamageVariant damageTint$getVariant() {
