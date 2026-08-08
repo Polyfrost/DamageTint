@@ -1,5 +1,6 @@
 package org.polyfrost.damagetint.client.utils;
 
+//? if >1.8.9
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.polyfrost.damagetint.client.DamageTintConfig;
 
@@ -8,6 +9,7 @@ public final class OverlayCoords {
 
     private static final int LAST_FADE_ROW = 7;
 
+    //? if >1.8.9 {
     public static int of(boolean hasRedOverlay, int hurtTime, int deathTime, DamageVariant variant, int vanillaU) {
         boolean separateColors = DamageTintConfig.DamageTypeColors.enabled;
         if (!DamageTintConfig.enabled || !hasRedOverlay || (!DamageTintConfig.fade && !separateColors)) {
@@ -33,4 +35,9 @@ public final class OverlayCoords {
     private static int fadeRow(float progress) {
         return Math.clamp(Math.round(progress * LAST_FADE_ROW), 0, LAST_FADE_ROW);
     }
+    //?} else {
+    /*public static int of(boolean hasRedOverlay, int hurtTime, int deathTime, DamageVariant variant, int vanillaU) {
+        return NO_OVERRIDE;
+    }
+    *///?}
 }
