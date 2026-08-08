@@ -39,8 +39,8 @@ public class DamageTintConfig extends Config {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
 
         Tree oldConfig = ConfigManager.active().load(id);
-        // OneConfig already runs the type adapter while loading, so the property normally holds a
-        // PolyColor. Older configs stored the raw array form, which still needs the adapter.
+        // OneConfig runs the adapter on load so this is usually a PolyColor
+        // Older configs stored the raw array form which still needs the adapter
         Object oldRaw = oldConfig == null || oldConfig.getProp("color") == null ? null : oldConfig.getProp("color").get();
         PolyColor oldColor = oldRaw == null ? null
                 : oldRaw instanceof PolyColor ? (PolyColor) oldRaw
@@ -63,7 +63,7 @@ public class DamageTintConfig extends Config {
             int r = argb >> 16 & 0xFF;
             int g = argb >> 8 & 0xFF;
             int b = argb & 0xFF;
-            // Alpha is flipped for some reason, so 0 is fully opaque and 255 is fully transparent... Why, Mojang? Other developer note: 😭😭😭😭😭
+            // Overlay alpha is inverted so 0 is fully opaque and 255 fully transparent
             int a = 255 - (argb >>> 24);
 
             OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();

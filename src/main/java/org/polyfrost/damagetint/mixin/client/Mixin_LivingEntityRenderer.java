@@ -58,7 +58,7 @@ public class Mixin_LivingEntityRenderer {
         }
     }
     //?} else {
-    /*// 1.21.1 has an entirely different method sig/approach
+    /*// 1.21.1 takes the entity directly instead of a render state
     @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
     private static void onGetOverlayCoords(LivingEntity entity, float f, CallbackInfoReturnable<Integer> cir) {
         if (DamageTintConfig.fade && DamageTintConfig.enabled) {

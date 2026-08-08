@@ -60,11 +60,11 @@ repositories {
 
 loom {
     runConfigs.all {
-        ideConfigGenerated(stonecutter.current.isActive)
-        runDir = "../../run" // This sets the run folder for all mc versions to the same folder. Remove this line if you want individual run folders.
+        generateRunConfig = stonecutter.current.isActive
+        runDirectory = rootProject.file("run")
     }
 
-    runConfigs.remove(runConfigs["server"]) // Removes server run configs
+    runConfigs.remove(runConfigs["server"])
 }
 
 dependencies {
