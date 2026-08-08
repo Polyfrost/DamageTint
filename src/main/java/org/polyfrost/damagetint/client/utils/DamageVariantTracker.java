@@ -1,13 +1,22 @@
 package org.polyfrost.damagetint.client.utils;
 
+//? if >1.8.9 {
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+//?}
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+//? if >1.8.9
 import net.minecraft.world.entity.projectile.Projectile;
-//? if <1.21.4
+//? if >1.8.9 && <1.21.4
 //import net.minecraft.world.item.MaceItem;
+
+//? if =1.8.9 {
+/*import net.minecraft.entity.living.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.UseAction;
+*///?}
 
 public final class DamageVariantTracker {
 
@@ -16,11 +25,34 @@ public final class DamageVariantTracker {
     private DamageVariantTracker() {
     }
 
+    //? if >1.8.9 {
     public static void record(LivingEntity entity, DamageSource source) {
         DamageVariantHolder holder = (DamageVariantHolder) entity;
         holder.damageTint$setVariant(classify(source));
         holder.damageTint$setHurtTick(entity.tickCount);
     }
+    //?} else {
+    /*public static void record(LivingEntity entity) {
+        DamageVariantHolder holder = (DamageVariantHolder) entity;
+        holder.damageTint$setVariant(isBlocking(entity) ? DamageVariant.BLOCK : DamageVariant.OTHER);
+        holder.damageTint$setHurtTick(entity.tickCount);
+    }
+
+    // isSwordBlocking reads itemInUse, which RemoteClientPlayerEntity only rebuilds once a tick and
+    // so can be stale here; the synced flag is current but is never set for our own player.
+    private static boolean isBlocking(LivingEntity entity) {
+        if (!(entity instanceof PlayerEntity player)) {
+            return false;
+        }
+
+        if (player.isSwordBlocking()) {
+            return true;
+        }
+
+        ItemStack held = player.inventory.getSelectedItem();
+        return player.isUsingItem() && held != null && held.getUseAction() == UseAction.BLOCK;
+    }
+    *///?}
 
     public static void recordCrit(LivingEntity entity) {
         DamageVariantHolder holder = (DamageVariantHolder) entity;
@@ -29,7 +61,7 @@ public final class DamageVariantTracker {
             return;
         }
 
-        if (entity.hurtTime > 0 && variant != DamageVariant.MACE) {
+        if (entity.hurtTime > 0 && variant != DamageVariant.MACE && variant != DamageVariant.BLOCK) {
             holder.damageTint$setVariant(DamageVariant.CRIT);
         }
     }
@@ -39,6 +71,7 @@ public final class DamageVariantTracker {
         return variant != null ? variant : DamageVariant.OTHER;
     }
 
+    //? if >1.8.9 {
     private static DamageVariant classify(DamageSource source) {
         //? if >=1.21.4 {
         if (source.is(DamageTypeTags.IS_MACE_SMASH)) {
@@ -87,8 +120,9 @@ public final class DamageVariantTracker {
 
         return DamageVariant.OTHER;
     }
+    //?}
 
-    //? if <1.21.4 {
+    //? if >1.8.9 && <1.21.4 {
     /*private static boolean isSmashAttack(DamageSource source) {
         return source.getEntity() instanceof LivingEntity attacker
                 && attacker.getWeaponItem().getItem() instanceof MaceItem
