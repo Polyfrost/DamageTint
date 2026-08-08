@@ -51,7 +51,7 @@ public class DamageTintConfig extends Config {
             updateOverlayColor(colorV2);
         }));
         addCallback("fade", () -> updateOverlayColor(colorV2));
-        if (oldColor != null && (oldColor.getChroma() || oldColor.getArgb() != legacyDefaultColor)) {
+        if (oldColor != null && (oldColor.getChroma() || oldColor.getRawArgb() != legacyDefaultColor)) {
             colorV2 = oldColor;
         }
         save();
