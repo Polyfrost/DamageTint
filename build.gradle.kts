@@ -26,6 +26,9 @@ repositories {
     google()
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
+    maven("https://api.modrinth.com/maven") {
+        content { includeGroup("maven.modrinth") }
+    }
     maven("https://maven.parchmentmc.org") {
         content {
             includeGroupAndSubgroups("org.parchmentmc")
