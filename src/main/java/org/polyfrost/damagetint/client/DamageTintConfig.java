@@ -11,9 +11,12 @@ import org.polyfrost.oneconfig.api.config.v1.Tree;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Color;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch;
-import org.polyfrost.oneconfig.api.config.v1.serialize.adapter.impl.PolyColorAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DamageTintConfig extends Config {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("DamageTint/Config");
 
     @Switch(title = "Enable Damage Tint")
     public static boolean enabled = true;
@@ -38,13 +41,7 @@ public class DamageTintConfig extends Config {
     public DamageTintConfig() {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
 
-        Tree oldConfig = ConfigManager.active().load(id);
-        // OneConfig already runs the type adapter while loading, so the property normally holds a
-        // PolyColor. Older configs stored the raw array form, which still needs the adapter.
-        Object oldRaw = oldConfig == null || oldConfig.getProp("color") == null ? null : oldConfig.getProp("color").get();
-        PolyColor oldColor = oldRaw == null ? null
-                : oldRaw instanceof PolyColor ? (PolyColor) oldRaw
-                : new PolyColorAdapter().deserialize(oldRaw);
+        PolyColor oldColor = readLegacyColor();
 
         addCallback("enabled", () -> updateOverlayColor(colorV2));
         addCallback("colorV2", (() -> {
@@ -55,6 +52,20 @@ public class DamageTintConfig extends Config {
             colorV2 = oldColor;
         }
         save();
+    }
+
+    private PolyColor readLegacyColor() {
+        try {
+            Tree oldConfig = ConfigManager.active().load(id);
+            if (oldConfig == null || oldConfig.getProp("color") == null) {
+                return null;
+            }
+            return LegacyColorMigration.read(oldConfig.getProp("color").get());
+        } catch (Throwable t) {
+            LOGGER.warn("Could not load the existing {} config to migrate its colour; "
+                    + "continuing with the default colour.", id, t);
+            return null;
+        }
     }
 
     public static void updateOverlayColor(PolyColor newColor) {
