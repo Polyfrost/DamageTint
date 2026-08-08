@@ -1,5 +1,6 @@
 package org.polyfrost.damagetint.mixin.client;
 
+//? if > 1.8.9 {
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 //? if >= 1.21.10 {
@@ -16,9 +17,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import org.spongepowered.asm.mixin.Unique;
+//?} else {
+/*import net.minecraft.client.render.entity.EnderDragonRenderer;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.entity.living.mob.monster.boss.EnderDragonEntity;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+*///?}
 import org.polyfrost.damagetint.client.DamageTintConfig;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 //? if >=1.21.4 {
@@ -30,6 +38,7 @@ import java.util.WeakHashMap;
 @Mixin(EnderDragonRenderer.class)
 public class Mixin_EnderDragonRenderer {
 
+    //? if > 1.8.9 {
     //? if >= 1.21.4 {
     @Unique
     private final Map<EnderDragonRenderState, Integer> damageTint$hurtTimeMap = Collections.synchronizedMap(new WeakHashMap<>());
@@ -77,4 +86,31 @@ public class Mixin_EnderDragonRenderer {
         row = Math.clamp(row, 0, 7);
         return OverlayTexture.pack(original & 0xFFFF, row);
     }
+    //?} else {
+    /*@Inject(
+            method = "renderModel(Lnet/minecraft/entity/living/mob/monster/boss/EnderDragonEntity;FFFFFF)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/platform/GlStateManager;color4f(FFFF)V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void damageTint$modifyTint(EnderDragonEntity entity, float limbAngle, float limbDistance, float tickDelta, float yaw, float pitch, float scale, CallbackInfo ci) {
+        if (!DamageTintConfig.enabled) {
+            return;
+        }
+
+        int argb = DamageTintConfig.colorV2.getArgb();
+        float alpha = (argb >>> 24) / 255.0f;
+        float r = (argb >> 16 & 0xFF) / 255.0f;
+        float g = (argb >> 8 & 0xFF) / 255.0f;
+        float b = (argb & 0xFF) / 255.0f;
+
+        if (DamageTintConfig.fade) {
+            alpha *= Math.clamp(entity.damagedTimer / DamageTintConfig.fadeDuration, 0.0f, 1.0f);
+        }
+
+        GlStateManager.color4f(r, g, b, alpha);
+    }
+    *///?}
 }
