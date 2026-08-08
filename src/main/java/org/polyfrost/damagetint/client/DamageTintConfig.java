@@ -39,8 +39,12 @@ public class DamageTintConfig extends Config {
         super("damagetint.json", "/assets/damagetint/damagetint_dark.svg", DamageTintConstants.NAME, Category.QOL);
 
         Tree oldConfig = ConfigManager.active().load(id);
-        PolyColor oldColor = oldConfig == null || oldConfig.getProp("color") == null ? null
-                : new PolyColorAdapter().deserialize(oldConfig.getProp("color").get());
+        // OneConfig already runs the type adapter while loading, so the property normally holds a
+        // PolyColor. Older configs stored the raw array form, which still needs the adapter.
+        Object oldRaw = oldConfig == null || oldConfig.getProp("color") == null ? null : oldConfig.getProp("color").get();
+        PolyColor oldColor = oldRaw == null ? null
+                : oldRaw instanceof PolyColor ? (PolyColor) oldRaw
+                : new PolyColorAdapter().deserialize(oldRaw);
 
         addCallback("enabled", () -> updateOverlayColor(colorV2));
         addCallback("colorV2", (() -> {
