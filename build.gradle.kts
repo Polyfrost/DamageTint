@@ -6,185 +6,159 @@ plugins {
     id("dev.kikugie.loom-back-compat")
     id("org.jetbrains.kotlin.jvm") version "2.4.0"
     id("dev.deftu.gradle.bloom") version "0.2.0"
-    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
+    id("me.modmuss50.mod-publish-plugin") version "2.0.0"
 }
 
-val modid = property("mod.id") as String
-val modname = property("mod.name") as String
-val modversion = property("mod.version") as String
-val mcversion = property("minecraft_version") as String
-val versionrange = property("minecraft_version_range")
-val loaderversion = property("loader_version")
+val modid: String = sc.properties["mod.id"]
+val modname: String = sc.properties["mod.name"]
+val modversion: String = sc.properties["mod.version"]
+val mcversion: String = sc.current.version
+val versionrange: String = sc.properties["mod.mc_compat"]
+val loaderversion: String = sc.properties["deps.fabric_loader"]
+val oneconfigversion: String = sc.properties["deps.oneconfig"]
 
-base {
-    archivesName.set("$modid-$modversion+$mcversion")
+version = "$modversion+$mcversion"
+base.archivesName = modid
+
+val requiredJava: JavaVersion = when {
+    sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
+    sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
+    else -> JavaVersion.VERSION_1_8
 }
+
+val compatibleVersions: List<String> = sc.properties.rawOrNull("mod", "mc_releases")
+    ?.asList().orEmpty().map { it.toString() }
 
 repositories {
+    fun strictMaven(url: String, alias: String, vararg groups: String) = exclusiveContent {
+        forRepository { maven(url) { name = alias } }
+        filter { groups.forEach(::includeGroup) }
+    }
+
     mavenCentral()
-    gradlePluginPortal()
     google()
-    maven("https://repo.polyfrost.org/releases")
-    maven("https://repo.polyfrost.org/snapshots")
-    maven("https://maven.parchmentmc.org") {
-        content {
-            includeGroupAndSubgroups("org.parchmentmc")
-        }
+    maven("https://repo.polyfrost.org/releases") { name = "Polyfrost Releases" }
+    maven("https://repo.polyfrost.org/snapshots") { name = "Polyfrost Snapshots" }
+    maven("https://central.sonatype.com/repository/maven-snapshots") {
+        name = "Sonatype Snapshots"
+        content { includeGroup("net.kyori") }
     }
-    maven("https://maven.gegy.dev/releases") {
-        content {
-            includeGroup("dev.lambdaurora")
-        }
+    strictMaven("https://maven.deftu.dev/releases", "Deftu", "dev.deftu")
+    strictMaven("https://maven.terraformersmc.com/", "TerraformersMC", "com.terraformersmc")
+    strictMaven("https://maven.fabricmc.net/", "FabricMC", "net.fabricmc")
+    strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
+    strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:$mcversion")
+    loomx.applyMojangMappings()
+
+    modImplementation("net.fabricmc:fabric-loader:$loaderversion")
+    modImplementation("org.polyfrost.oneconfig:$mcversion-fabric:$oneconfigversion")
+    for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils", "hud")) {
+        implementation("org.polyfrost.oneconfig:$module:$oneconfigversion")
     }
-    maven("https://maven.terraformersmc.com/") {
-        content {
-            includeGroup("com.terraformersmc")
-        }
-    }
-    maven("https://central.sonatype.com/repository/maven-snapshots/") {
-        content {
-            includeGroup("net.kyori")
-        }
-    }
-    maven("https://maven.deftu.dev/releases") {
-        content {
-            includeGroup("dev.deftu")
-        }
-    }
-    maven("https://maven.fabricmc.net/releases") {
-        content {
-            includeGroup("net.fabricmc")
-        }
-    }
+
+    testImplementation("org.junit.jupiter:junit-jupiter:${sc.properties.get<String>("deps.junit")}")
+    testImplementation("net.fabricmc:fabric-loader-junit:$loaderversion")
 }
 
 loom {
+    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
+
+    decompilerOptions.named("vineflower") {
+        options.put("mark-corresponding-synthetics", "1")
+    }
+
     runConfigs.all {
-        generateRunConfig = stonecutter.current.isActive
+        preferGradleTask = true
+        generateRunConfig = true
         runDirectory = rootProject.file("run")
+        jvmArguments.add("-Dmixin.debug.export=true")
     }
 
     runConfigs.remove(runConfigs["server"])
 }
 
-dependencies {
-    minecraft("com.mojang:minecraft:${property("minecraft_version")}")
+java {
+    withSourcesJar()
+    targetCompatibility = requiredJava
+    sourceCompatibility = requiredJava
 
-    val hasOfficialMappings = findProperty("has_official_mappings")?.toString()?.toBoolean() ?: true
-    if (hasOfficialMappings) {
-        @Suppress("UnstableApiUsage")
-        mappings(loom.layered {
-            officialMojangMappings()
-            optionalProp("parchment_version") {
-                parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
-            }
-            optionalProp("yalmm_version") {
-                mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
-            }
-        })
-    } else {
-         findProperty("mappings_version")?.toString()?.takeUnless { it.isBlank() }?.let {
-            mappings(it)
-        }
-    }
-    val oneconfigversion = property("oneconfig_version") as String
-    modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
-    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:commands:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:config:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:config-impl:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:events:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:internal:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:ui:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:utils:$oneconfigversion")
-    implementation("org.polyfrost.oneconfig:hud:$oneconfigversion")
-
-    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
-    testImplementation("net.fabricmc:fabric-loader-junit:${property("loader_version")}")
-}
-
-tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        showStackTraces = true
-        exceptionFormat = TestExceptionFormat.FULL
+    toolchain {
+        vendor = JvmVendorSpec.ADOPTIUM
+        languageVersion = JavaLanguageVersion.of(requiredJava.majorVersion)
     }
 }
 
-bloom {
-    replacement("@MOD_ID@", modid!!)
-    replacement("@MOD_NAME@", modname!!)
-    replacement("@MOD_VERSION@", modversion!!)
-}
-
-tasks.processResources {
-    val props = mapOf(
-        "mod_id" to modid,
-        "mod_name" to modname,
-        "mod_version" to modversion,
-        "minecraft_version_range" to versionrange,
-        "loader_version" to loaderversion
-    )
-
-    inputs.properties(props)
-
-    filesMatching("fabric.mod.json") {
-        expand(props)
-    }
-}
-
-val javaVersionStr = findProperty("java_version")?.toString() ?: "21"
-val javaVersionInt = javaVersionStr.toInt()
-
-val kotlinJvmTarget = when(javaVersionInt) {
-    21 -> JvmTarget.JVM_21
-    22 -> JvmTarget.JVM_22
-    23 -> JvmTarget.JVM_23
-    24 -> JvmTarget.JVM_24
-    25 -> JvmTarget.JVM_25
-    else -> JvmTarget.JVM_21
-}
+val kotlinJvmTarget = JvmTarget.fromTarget(requiredJava.majorVersion)
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(javaVersionInt)
+    options.release = requiredJava.majorVersion.toInt()
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(kotlinJvmTarget)
+    compilerOptions.jvmTarget = kotlinJvmTarget
 }
 
-java {
-    withSourcesJar()
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(javaVersionInt))
+bloom {
+    replacement("@MOD_ID@", modid)
+    replacement("@MOD_NAME@", modname)
+    replacement("@MOD_VERSION@", modversion)
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
+    }
+
+    processResources {
+        val props = mapOf(
+            "mod_id" to modid,
+            "mod_name" to modname,
+            "mod_version" to modversion,
+            "minecraft_version_range" to versionrange,
+            "loader_version" to loaderversion
+        )
+
+        inputs.properties(props)
+
+        filesMatching("fabric.mod.json") { expand(props) }
+    }
+
+    jar {
+        inputs.property("archivesName", base.archivesName)
+
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${inputs.properties["archivesName"]}" }
+        }
+    }
+
+    register<Copy>("buildAndCollect") {
+        group = "build"
+        description = "Builds mod jars and copies results to `build/libs/{mod version}/`"
+
+        inputs.property("version", modversion)
+        from(loomx.modJar.flatMap { it.archiveFile }, loomx.modSourcesJar.flatMap { it.archiveFile })
+        into(rootProject.layout.buildDirectory.file("libs/$modversion"))
     }
 }
 
-tasks.jar {
-    inputs.property("archivesName", base.archivesName)
+val modrinthId = listOf("oneconfig.publish.modrinth", "publish.modrinth")
+    .firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
+val modrinthToken = listOf("oneconfig.publish.modrinth.token", "publish.modrinth.token", "modrinth.token")
+    .firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
 
-    from("LICENSE") {
-        rename { "${it}_${inputs.properties["archivesName"]}" }
-    }
-}
-
-fun <T> optionalProp(property: String, block: (String) -> T?): T? =
-    findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
-
-
-val modrinthMinecraftVersionOverride = mapOf(
-    "26.1" to listOf("26.1", "26.1.1", "26.1.2"),
-    "26.1.1" to listOf("26.1", "26.1.1", "26.1.2"),
-    "26.1.2" to listOf("26.1", "26.1.1", "26.1.2")
-)
-
-val modrinthId = listOf("oneconfig.publish.modrinth", "publish.modrinth").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
-val modrinthToken = listOf("oneconfig.publish.modrinth.token", "publish.modrinth.token", "modrinth.token").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
-val minecraftVersion = modrinthMinecraftVersionOverride[mcversion] ?: listOf(mcversion)
-val publishJarTaskName = if ("remapJar" in tasks.names) "remapJar" else "jar"
 val changelogs = rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
 
-val validateChangelog by tasks.registering {
+val validateChangelog = tasks.register("validateChangelog") {
     description = "Validates that the changelog is written for the current version."
     if (!changelogs.contains(modversion)) {
         throw GradleException("Changelog for version $modversion not found.")
@@ -199,7 +173,7 @@ tasks.matching { it.name == "publishModrinth" }.configureEach {
 }
 
 publishMods {
-    file = tasks.named<AbstractArchiveTask>(publishJarTaskName).flatMap { it.archiveFile }
+    file = loomx.modJar.flatMap { it.archiveFile }
 
     displayName = modversion
     version = "v$modversion"
@@ -215,7 +189,7 @@ publishMods {
             projectId = modrinthId
             accessToken = modrinthToken.orEmpty()
 
-            minecraftVersions.addAll(minecraftVersion)
+            minecraftVersions.addAll(compatibleVersions.ifEmpty { listOf(mcversion) })
 
             requires("oneconfig")
             requires("fabric-language-kotlin")
