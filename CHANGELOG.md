@@ -1,2 +1,2 @@
-## 3.5.2
-- Fixed a crash on launch for players who upgraded from 3.5.0 to 3.5.1
+## 3.6.0
+- Added separate damage tint colors per damage type (melee, mace, ranged, explosion, magic, critical hits), toggleable in the config

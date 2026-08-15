@@ -1,4 +1,5 @@
 package org.polyfrost.damagetint.client;
+
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.FramebufferRenderEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
@@ -16,12 +17,12 @@ public class DamageTintClient {
 
     public void initialize() {
         DamageTintConfig.INSTANCE.preload();
-        EventManager.register(InitializationEvent.class, () -> DamageTintConfig.updateOverlayColor(DamageTintConfig.colorV2));
+        EventManager.register(InitializationEvent.class, DamageTintConfig::updateOverlayColors);
         EventManager.register(FramebufferRenderEvent.Start.class, this::updateChroma);
     }
 
     private void updateChroma() {
-        if (!DamageTintConfig.enabled || !DamageTintConfig.colorV2.getChroma()) {
+        if (!DamageTintConfig.enabled || !DamageTintConfig.hasChroma()) {
             lastChromaTime = 0L;
             return;
         }
@@ -32,6 +33,6 @@ public class DamageTintClient {
         }
 
         lastChromaTime = now;
-        DamageTintConfig.updateOverlayColor(DamageTintConfig.colorV2);
+        DamageTintConfig.updateOverlayColors();
     }
 }

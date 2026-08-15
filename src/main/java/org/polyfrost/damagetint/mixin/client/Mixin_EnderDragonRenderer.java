@@ -14,9 +14,10 @@ import net.minecraft.client.renderer.entity.state.EnderDragonRenderState;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //?}
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import org.polyfrost.damagetint.client.DamageTintConfig;
+import org.polyfrost.damagetint.client.utils.DamageVariant;
+import org.polyfrost.damagetint.client.utils.DamageVariantTracker;
+import org.polyfrost.damagetint.client.utils.OverlayCoords;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,10 +34,13 @@ public class Mixin_EnderDragonRenderer {
     //? if >= 1.21.4 {
     @Unique
     private final Map<EnderDragonRenderState, Integer> damageTint$hurtTimeMap = Collections.synchronizedMap(new WeakHashMap<>());
+    @Unique
+    private final Map<EnderDragonRenderState, DamageVariant> damageTint$variantMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/boss/enderdragon/EnderDragon;Lnet/minecraft/client/renderer/entity/state/EnderDragonRenderState;F)V", at = @At("HEAD"))
     private void damageTint$recordHurtTime(EnderDragon entity, EnderDragonRenderState state, float partialTicks, CallbackInfo ci) {
         damageTint$hurtTimeMap.put(state, entity.hurtTime);
+        damageTint$variantMap.put(state, DamageVariantTracker.get(entity));
     }
     //?}
 
@@ -47,7 +51,7 @@ public class Mixin_EnderDragonRenderer {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/OverlayTexture;pack(FZ)I")
     )
     private int damageTint$getOverlayCoords(int original, EnderDragonRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        return damageTint$fadeOverlay(original, state.hasRedOverlay, damageTint$hurtTimeMap.getOrDefault(state, 0));
+        return damageTint$overlayCoords(original, state);
     }
     //?} elif >= 1.21.4 {
     /*@ModifyExpressionValue(
@@ -55,7 +59,7 @@ public class Mixin_EnderDragonRenderer {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/OverlayTexture;pack(FZ)I")
     )
     private int damageTint$getOverlayCoords(int original, EnderDragonRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        return damageTint$fadeOverlay(original, state.hasRedOverlay, damageTint$hurtTimeMap.getOrDefault(state, 0));
+        return damageTint$overlayCoords(original, state);
     }
     *///?} else {
     /*@ModifyExpressionValue(
@@ -63,18 +67,21 @@ public class Mixin_EnderDragonRenderer {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/OverlayTexture;pack(FZ)I")
     )
     private int damageTint$getOverlayCoords(int original, EnderDragon entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        return damageTint$fadeOverlay(original, entity.hurtTime > 0, entity.hurtTime);
+        return damageTint$overlayCoords(original, entity.hurtTime > 0, entity.hurtTime, DamageVariantTracker.get(entity));
     }
     *///?}
 
+    //? if >= 1.21.4 {
     @Unique
-    private static int damageTint$fadeOverlay(int original, boolean hasRedOverlay, int hurtTime) {
-        if (!DamageTintConfig.enabled || !DamageTintConfig.fade || !hasRedOverlay) {
-            return original;
-        }
+    private int damageTint$overlayCoords(int original, EnderDragonRenderState state) {
+        return damageTint$overlayCoords(original, state.hasRedOverlay, damageTint$hurtTimeMap.getOrDefault(state, 0),
+                damageTint$variantMap.getOrDefault(state, DamageVariant.OTHER));
+    }
+    //?}
 
-        int row = Math.round((1.0f - (float) hurtTime / DamageTintConfig.fadeDuration) * 7.0f);
-        row = Math.clamp(row, 0, 7);
-        return OverlayTexture.pack(original & 0xFFFF, row);
+    @Unique
+    private static int damageTint$overlayCoords(int original, boolean hasRedOverlay, int hurtTime, DamageVariant variant) {
+        int coords = OverlayCoords.of(hasRedOverlay, hurtTime, 0, variant, original & 0xFFFF);
+        return coords == OverlayCoords.NO_OVERRIDE ? original : coords;
     }
 }

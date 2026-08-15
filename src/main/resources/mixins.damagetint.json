@@ -6,6 +6,8 @@
     "refmap": "mixins.${mod_id}.refmap.json",
     "client": [
         "client.Mixin_ModifyTintColor",
+        "client.Mixin_ClientPacketListener",
+        "client.Mixin_LivingEntity",
         "client.Mixin_LivingEntityRenderer",
         "client.Mixin_EnderDragonRenderer"
     ],
