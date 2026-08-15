@@ -33,9 +33,9 @@ public class Mixin_EnderDragonRenderer {
 
     //? if >= 1.21.4 {
     @Unique
-    private final Map<EnderDragonRenderState, Integer> damageTint$hurtTimeMap = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<EnderDragonRenderState, Integer> damageTint$hurtTimeMap = Collections.synchronizedMap(new WeakHashMap<>());
     @Unique
-    private final Map<EnderDragonRenderState, DamageVariant> damageTint$variantMap = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<EnderDragonRenderState, DamageVariant> damageTint$variantMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/boss/enderdragon/EnderDragon;Lnet/minecraft/client/renderer/entity/state/EnderDragonRenderState;F)V", at = @At("HEAD"))
     private void damageTint$recordHurtTime(EnderDragon entity, EnderDragonRenderState state, float partialTicks, CallbackInfo ci) {
