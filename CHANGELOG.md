@@ -1,2 +1,2 @@
-## 3.6.0
-- Added separate damage tint colors per damage type (melee, mace, ranged, explosion, magic, critical hits), toggleable in the config
+## 3.6.1
+- Fixed the game crashing when rendering an ender dragon on 1.21.4+
