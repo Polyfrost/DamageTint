@@ -30,6 +30,9 @@ public class DamageTintConfig extends Config {
     @Color(title = "Damage Tint Color")
     public static PolyColor colorV2 = new PolyColor(defaultColor);
 
+    @Switch(title = "Tint Armor", description = "Apply the damage tint to worn armor.")
+    public static boolean tintArmor = false;
+
     @Accordion(title = "Separate Colors Per Damage Type")
     public static class DamageTypeColors {
 
@@ -90,6 +93,12 @@ public class DamageTintConfig extends Config {
             colorV2 = oldColor;
         }
         save();
+    }
+
+    @Override
+    protected Tree makeTree() {
+        tintArmor = false;
+        return super.makeTree();
     }
 
     public static boolean hasChroma() {
