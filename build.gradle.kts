@@ -69,6 +69,9 @@ dependencies {
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
 
+    // fabric-api's transitive class tweakers pulled in via OneConfig break build
+    enableTransitiveAccessWideners = false
+
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1")
     }
