@@ -9,6 +9,7 @@
         "client.Mixin_ClientPacketListener",
         "client.Mixin_LivingEntity",
         "client.Mixin_LivingEntityRenderer",
+        "client.Mixin_ArmorOverlay",
         "client.Mixin_EnderDragonRenderer"
     ],
     "injectors": {
