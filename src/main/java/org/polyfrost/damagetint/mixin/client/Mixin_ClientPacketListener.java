@@ -7,7 +7,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.polyfrost.damagetint.client.utils.DamageVariantTracker;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -15,12 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPacketListener.class)
 public class Mixin_ClientPacketListener {
 
-    @Unique
-    private static final int DAMAGE_TINT$CRIT_ANIMATION = 4;
-
     @Inject(method = "handleAnimate", at = @At("TAIL"))
     private void damageTint$recordCrit(ClientboundAnimatePacket packet, CallbackInfo ci) {
-        if (packet.getAction() != DAMAGE_TINT$CRIT_ANIMATION) {
+        if (packet.getAction() != ClientboundAnimatePacket.CRITICAL_HIT) {
             return;
         }
 
