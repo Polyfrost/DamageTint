@@ -1,10 +1,10 @@
 package org.polyfrost.damagetint.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 //? if >=1.21.4 {
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 //?}
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.LivingEntity;
 //? if >=1.21.4 {
 import org.polyfrost.damagetint.client.utils.DamageTintRenderState;
@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntityRenderer.class)
 public class Mixin_LivingEntityRenderer {
@@ -30,24 +29,22 @@ public class Mixin_LivingEntityRenderer {
         ((DamageTintRenderState) state).damageTint$extract(entity);
     }
 
-    @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
-    private static void onGetOverlayCoords(LivingEntityRenderState state, float f, CallbackInfoReturnable<Integer> cir) {
+    @ModifyReturnValue(method = "getOverlayCoords", at = @At("RETURN"))
+    private static int onGetOverlayCoords(int original, LivingEntityRenderState state) {
         DamageTintRenderState data = (DamageTintRenderState) state;
-        damageTint$overrideOverlayCoords(cir, data.damageTint$getHurtTime(), data.damageTint$getDeathTime(), data.damageTint$getVariant(), f);
+        return damageTint$overlayCoords(original, data.damageTint$getHurtTime(), data.damageTint$getDeathTime(), data.damageTint$getVariant());
     }
     //?} else {
-    /*@Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
-    private static void onGetOverlayCoords(LivingEntity entity, float f, CallbackInfoReturnable<Integer> cir) {
-        damageTint$overrideOverlayCoords(cir, entity.hurtTime, entity.deathTime, DamageVariantTracker.get(entity), f);
+    /*@ModifyReturnValue(method = "getOverlayCoords", at = @At("RETURN"))
+    private static int onGetOverlayCoords(int original, LivingEntity entity) {
+        return damageTint$overlayCoords(original, entity.hurtTime, entity.deathTime, DamageVariantTracker.get(entity));
     }
     *///?}
 
     @Unique
-    private static void damageTint$overrideOverlayCoords(CallbackInfoReturnable<Integer> cir, int hurtTime, int deathTime, DamageVariant variant, float whiteOverlayProgress) {
+    private static int damageTint$overlayCoords(int original, int hurtTime, int deathTime, DamageVariant variant) {
         boolean hasRedOverlay = hurtTime > 0 || deathTime > 0;
-        int coords = OverlayCoords.of(hasRedOverlay, hurtTime, deathTime, variant, OverlayTexture.u(whiteOverlayProgress));
-        if (coords != OverlayCoords.NO_OVERRIDE) {
-            cir.setReturnValue(coords);
-        }
+        int coords = OverlayCoords.of(hasRedOverlay, hurtTime, deathTime, variant, original & 0xFFFF);
+        return coords == OverlayCoords.NO_OVERRIDE ? original : coords;
     }
 }
