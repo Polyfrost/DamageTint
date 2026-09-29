@@ -10,6 +10,11 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.MixinEnvironment.Option;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 
+//? if >=1.21.4 {
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import org.polyfrost.damagetint.client.utils.DamageTintRenderState;
+//?}
+
 /**
  * Audits mixins to ensure their validity without launching a full Minecraft client.
  * Implementation inspired by <a href="https://github.com/SkyblockerMod/Skyblocker">Skyblocker</a>.
@@ -38,4 +43,12 @@ public class MixinTest {
         environment.setOption(Option.REFMAP_REMAP, false);
         environment.audit();
     }
+
+    //? if >=1.21.4 {
+    @Test
+    @DisplayName("render state mixin is applied")
+    public void renderStateMixinApplied() {
+        Assertions.assertTrue(DamageTintRenderState.class.isAssignableFrom(EntityRenderState.class));
+    }
+    //?}
 }

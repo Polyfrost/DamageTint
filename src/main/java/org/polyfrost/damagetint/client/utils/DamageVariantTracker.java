@@ -9,14 +9,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 //? if <1.21.4
 //import net.minecraft.world.item.MaceItem;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 public final class DamageVariantTracker {
-
-    private static final Map<LivingEntity, DamageVariant> VARIANTS = Collections.synchronizedMap(new WeakHashMap<>());
-    private static final Map<LivingEntity, Integer> HURT_TICKS = Collections.synchronizedMap(new WeakHashMap<>());
 
     private static final int CRIT_WINDOW_TICKS = 1;
 
@@ -24,23 +17,26 @@ public final class DamageVariantTracker {
     }
 
     public static void record(LivingEntity entity, DamageSource source) {
-        VARIANTS.put(entity, classify(source));
-        HURT_TICKS.put(entity, entity.tickCount);
+        DamageVariantHolder holder = (DamageVariantHolder) entity;
+        holder.damageTint$setVariant(classify(source));
+        holder.damageTint$setHurtTick(entity.tickCount);
     }
 
     public static void recordCrit(LivingEntity entity) {
-        Integer hurtTick = HURT_TICKS.get(entity);
-        if (hurtTick == null || entity.tickCount - hurtTick > CRIT_WINDOW_TICKS) {
+        DamageVariantHolder holder = (DamageVariantHolder) entity;
+        DamageVariant variant = holder.damageTint$getVariant();
+        if (variant == null || entity.tickCount - holder.damageTint$getHurtTick() > CRIT_WINDOW_TICKS) {
             return;
         }
 
-        if (entity.hurtTime > 0 && get(entity) != DamageVariant.MACE) {
-            VARIANTS.put(entity, DamageVariant.CRIT);
+        if (entity.hurtTime > 0 && variant != DamageVariant.MACE) {
+            holder.damageTint$setVariant(DamageVariant.CRIT);
         }
     }
 
     public static DamageVariant get(LivingEntity entity) {
-        return VARIANTS.getOrDefault(entity, DamageVariant.OTHER);
+        DamageVariant variant = ((DamageVariantHolder) entity).damageTint$getVariant();
+        return variant != null ? variant : DamageVariant.OTHER;
     }
 
     private static DamageVariant classify(DamageSource source) {

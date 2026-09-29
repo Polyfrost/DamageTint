@@ -11,36 +11,27 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.entity.EnderDragonRenderer;
 //? if >= 1.21.4 {
 import net.minecraft.client.renderer.entity.state.EnderDragonRenderState;
+import org.polyfrost.damagetint.client.utils.DamageTintRenderState;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //?}
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import org.polyfrost.damagetint.client.utils.DamageVariant;
-import org.polyfrost.damagetint.client.utils.DamageVariantTracker;
+//? if <1.21.4 {
+/*import org.polyfrost.damagetint.client.utils.DamageVariantTracker;
+*///?}
 import org.polyfrost.damagetint.client.utils.OverlayCoords;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-//? if >=1.21.4 {
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
-//?}
-
 @Mixin(EnderDragonRenderer.class)
 public class Mixin_EnderDragonRenderer {
 
     //? if >= 1.21.4 {
-    @Unique
-    private static final Map<EnderDragonRenderState, Integer> damageTint$hurtTimeMap = Collections.synchronizedMap(new WeakHashMap<>());
-    @Unique
-    private static final Map<EnderDragonRenderState, DamageVariant> damageTint$variantMap = Collections.synchronizedMap(new WeakHashMap<>());
-
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/boss/enderdragon/EnderDragon;Lnet/minecraft/client/renderer/entity/state/EnderDragonRenderState;F)V", at = @At("HEAD"))
     private void damageTint$recordHurtTime(EnderDragon entity, EnderDragonRenderState state, float partialTicks, CallbackInfo ci) {
-        damageTint$hurtTimeMap.put(state, entity.hurtTime);
-        damageTint$variantMap.put(state, DamageVariantTracker.get(entity));
+        ((DamageTintRenderState) state).damageTint$extract(entity);
     }
     //?}
 
@@ -74,8 +65,8 @@ public class Mixin_EnderDragonRenderer {
     //? if >= 1.21.4 {
     @Unique
     private int damageTint$overlayCoords(int original, EnderDragonRenderState state) {
-        return damageTint$overlayCoords(original, state.hasRedOverlay, damageTint$hurtTimeMap.getOrDefault(state, 0),
-                damageTint$variantMap.getOrDefault(state, DamageVariant.OTHER));
+        DamageTintRenderState data = (DamageTintRenderState) state;
+        return damageTint$overlayCoords(original, state.hasRedOverlay, data.damageTint$getHurtTime(), data.damageTint$getVariant());
     }
     //?}
 

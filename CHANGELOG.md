@@ -1,2 +1,2 @@
-## 3.7.0
-- Added support for Minecraft 26.3
+## Unreleased changes
+- Improved entity rendering performance
