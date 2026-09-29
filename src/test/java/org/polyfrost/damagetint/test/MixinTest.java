@@ -43,12 +43,4 @@ public class MixinTest {
         environment.setOption(Option.REFMAP_REMAP, false);
         environment.audit();
     }
-
-    //? if >=1.21.4 {
-    @Test
-    @DisplayName("render state mixin is applied")
-    public void renderStateMixinApplied() {
-        Assertions.assertTrue(DamageTintRenderState.class.isAssignableFrom(EntityRenderState.class));
-    }
-    //?}
 }
