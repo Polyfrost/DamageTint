@@ -11,6 +11,10 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 
+# Eclipse
+.project
+.classpath
+.settings/
 
 # IntelliJ
 /.idea/
@@ -22,4 +26,5 @@ gradle-app.setting
 # Minecraft
 **/run/
 **/.fabric/
+versions/*/bin/
 versions/*/logs/

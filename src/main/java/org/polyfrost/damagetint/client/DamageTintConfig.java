@@ -1,6 +1,7 @@
 package org.polyfrost.damagetint.client;
 
 import net.minecraft.client.Minecraft;
+//? if >1.8.9
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.polyfrost.compose.render.PolyColor;
 import org.polyfrost.damagetint.DamageTintConstants;
@@ -26,6 +27,8 @@ public class DamageTintConfig extends Config {
 
     private static final int defaultColor = 0x4DFF0000;
     private static final int legacyDefaultColor = 1291780096;
+    private static final int defaultCritColor = 0x66CFA62B;
+    private static final int defaultBlockColor = 0x99000000;
 
     @Color(title = "Damage Tint Color")
     public static PolyColor colorV2 = new PolyColor(defaultColor);
@@ -36,8 +39,12 @@ public class DamageTintConfig extends Config {
         @Include
         public static boolean enabled = false;
 
+        //? if >1.8.9 {
         @Info(title = "Colors may be inaccurate on some servers",
                 description = "Some servers do not report the damage type correctly, so hits may be tinted with the wrong color or fall back to the main damage tint color.")
+        //?} else {
+        /*@Info(title = "Critical and blocked hit colors follow what the server shows you")
+        *///?}
         public static String warning = "";
 
         @Color(title = "Melee Damage Color")
@@ -56,7 +63,12 @@ public class DamageTintConfig extends Config {
         public static PolyColor magic = new PolyColor(defaultColor);
 
         @Color(title = "Critical Hit Color")
-        public static PolyColor crit = new PolyColor(defaultColor);
+        public static PolyColor crit = new PolyColor(defaultCritColor);
+
+        // only shown on 1.8.9
+        //~ if =1.8.9 '@Include' -> '@Color(title = "Blocked Hit Color")'
+        @Include
+        public static PolyColor block = new PolyColor(defaultBlockColor);
     }
 
     @Switch(title = "Fade Out Damage Tint")
@@ -86,6 +98,13 @@ public class DamageTintConfig extends Config {
             addCallback(option, DamageTintConfig::updateOverlayColors);
         }
 
+        //? if =1.8.9 {
+        /*for (String undetectable : new String[]{"DamageTypeColors.melee", "DamageTypeColors.mace",
+                "DamageTypeColors.ranged", "DamageTypeColors.explosion", "DamageTypeColors.magic"}) {
+            hideIf(undetectable, () -> true);
+        }
+        *///?}
+
         if (oldColor != null && (oldColor.getChroma() || oldColor.getRawArgb() != legacyDefaultColor)) {
             colorV2 = oldColor;
         }
@@ -103,7 +122,27 @@ public class DamageTintConfig extends Config {
                 || DamageTypeColors.magic.getChroma() || DamageTypeColors.crit.getChroma());
     }
 
+    //? if =1.8.9 {
+    /*public static PolyColor colorFor(DamageVariant variant) {
+        if (!DamageTypeColors.enabled) {
+            return colorV2;
+        }
+
+        return switch (variant) {
+            case MELEE -> DamageTypeColors.melee;
+            case MACE -> DamageTypeColors.mace;
+            case RANGED -> DamageTypeColors.ranged;
+            case EXPLOSION -> DamageTypeColors.explosion;
+            case MAGIC -> DamageTypeColors.magic;
+            case CRIT -> DamageTypeColors.crit;
+            case BLOCK -> DamageTypeColors.block;
+            case OTHER -> colorV2;
+        };
+    }
+    *///?}
+
     public static void updateOverlayColors() {
+        //? if >1.8.9 {
         Minecraft.getInstance().execute(() -> {
             int[] columns = new int[DamageVariant.COLUMNS];
             Arrays.fill(columns, enabled ? colorV2.getArgb() : defaultColor);
@@ -120,5 +159,6 @@ public class DamageTintConfig extends Config {
             OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
             ((OverlayModifier) overlayTexture).damageTint$setOverlayColors(columns, enabled && fade);
         });
+        //?}
     }
 }

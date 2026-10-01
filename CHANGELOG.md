@@ -1,2 +1,4 @@
-## 3.6.1
-- Fixed the game crashing when rendering an ender dragon on 1.21.4+
+## 3.7.1
+- Improved entity rendering performance
+- Fixed critical hit color not applying on Minecraft 26.3
+- Improved compatibility with other mods that modify entity overlays

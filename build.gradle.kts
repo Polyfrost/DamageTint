@@ -1,21 +1,42 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import net.ornithemc.ploceus.api.PloceusGradleExtensionApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("dev.kikugie.loom-back-compat")
+    id("net.fabricmc.fabric-loom-remap") version "1.17-SNAPSHOT" apply false
+    id("ploceus") version "1.17.4" apply false
     id("org.jetbrains.kotlin.jvm") version "2.4.10"
     id("dev.deftu.gradle.bloom") version "0.2.0"
     id("me.modmuss50.mod-publish-plugin") version "2.2.0"
+}
+
+val isOrnithe = stonecutter.current.version == "1.8.9"
+val ploceus = if (isOrnithe) {
+    pluginManager.apply("net.fabricmc.fabric-loom-remap")
+    pluginManager.apply("ploceus")
+
+    configurations.configureEach {
+        exclude(group = "org.lwjgl.lwjgl")
+    }
+
+    extensions.getByType<PloceusGradleExtensionApi>().apply {
+        setIntermediaryGeneration(2)
+    }
+} else {
+    null
 }
 
 val modid: String = sc.properties["mod.id"]
 val modname: String = sc.properties["mod.name"]
 val modversion: String = sc.properties["mod.version"]
 val mcversion: String = sc.current.version
+val mcDependencyVersion: String = sc.properties.getOrNull<String>("deps.minecraft") ?: mcversion
 val versionrange: String = sc.properties["mod.mc_compat"]
 val loaderversion: String = sc.properties["deps.fabric_loader"]
 val oneconfigversion: String = sc.properties["deps.oneconfig"]
+val loader = if (isOrnithe) "ornithe" else "fabric"
 
 version = "$modversion+$mcversion"
 base.archivesName = modid
@@ -25,7 +46,7 @@ val requiredJava: JavaVersion = when {
     sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
     sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
     sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
-    else -> JavaVersion.VERSION_1_8
+    else -> JavaVersion.VERSION_25
 }
 
 val compatibleVersions: List<String> = sc.properties.rawOrNull("mod", "mc_releases")
@@ -37,6 +58,7 @@ repositories {
         filter { groups.forEach(::includeGroup) }
     }
 
+    mavenLocal()
     mavenCentral()
     google()
     maven("https://repo.polyfrost.org/releases") { name = "Polyfrost Releases" }
@@ -44,6 +66,9 @@ repositories {
     maven("https://central.sonatype.com/repository/maven-snapshots") {
         name = "Sonatype Snapshots"
         content { includeGroup("net.kyori") }
+    }
+    maven("https://maven.cloverclient.com/releases") {
+        content { includeGroup("pl.tomgirl") }
     }
     strictMaven("https://maven.deftu.dev/releases", "Deftu", "dev.deftu")
     strictMaven("https://maven.terraformersmc.com/", "TerraformersMC", "com.terraformersmc")
@@ -53,11 +78,19 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$mcversion")
-    loomx.applyMojangMappings()
+    minecraft("com.mojang:minecraft:$mcDependencyVersion")
+    if (isOrnithe) {
+        mappings(loom.layered {
+            mappings(ploceus!!.featherMappings(sc.properties["feather_build"] as String))
+            mappings(rootProject.file("mappings/feather-overrides.tiny"))
+        })
+        testCompileOnly("net.ornithemc.osl-gen2:entrypoints:${sc.properties["deps.osl_entrypoints"] as String}")
+    } else {
+        loomx.applyMojangMappings()
+    }
 
     modImplementation("net.fabricmc:fabric-loader:$loaderversion")
-    modImplementation("org.polyfrost.oneconfig:$mcversion-fabric:$oneconfigversion")
+    modImplementation("org.polyfrost.oneconfig:$mcversion-$loader:$oneconfigversion")
     for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils", "hud")) {
         implementation("org.polyfrost.oneconfig:$module:$oneconfigversion")
     }
@@ -171,6 +204,9 @@ tasks.publishMods.configure {
 tasks.matching { it.name == "publishModrinth" }.configureEach {
     dependsOn(validateChangelog)
 }
+tasks.matching { it.name.startsWith("publish") }.configureEach {
+    enabled = isOrnithe
+}
 
 publishMods {
     file = loomx.modJar.flatMap { it.archiveFile }
@@ -180,7 +216,7 @@ publishMods {
     changelog = changelogs
     type = STABLE
 
-    modLoaders.add("fabric")
+    modLoaders.add(loader)
 
     dryRun = modrinthId == null || modrinthToken == null
 
