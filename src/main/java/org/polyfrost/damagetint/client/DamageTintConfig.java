@@ -26,6 +26,8 @@ public class DamageTintConfig extends Config {
 
     private static final int defaultColor = 0x4DFF0000;
     private static final int legacyDefaultColor = 1291780096;
+    private static final int defaultCritColor = 0x66CFA62B;
+    private static final int defaultBlockColor = 0x99000000;
 
     @Color(title = "Damage Tint Color")
     public static PolyColor colorV2 = new PolyColor(defaultColor);
@@ -56,7 +58,11 @@ public class DamageTintConfig extends Config {
         public static PolyColor magic = new PolyColor(defaultColor);
 
         @Color(title = "Critical Hit Color")
-        public static PolyColor crit = new PolyColor(defaultColor);
+        public static PolyColor crit = new PolyColor(defaultCritColor);
+
+        // only shown on 1.8.9
+        @Include
+        public static PolyColor block = new PolyColor(defaultBlockColor);
     }
 
     @Switch(title = "Fade Out Damage Tint")
