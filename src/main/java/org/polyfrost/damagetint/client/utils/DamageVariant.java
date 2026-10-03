@@ -7,7 +7,8 @@ public enum DamageVariant {
     MAGIC(3),
     CRIT(4),
     MACE(5),
-    EXPLOSION(6);
+    EXPLOSION(6),
+    BLOCK(7);
 
     public static final int COLUMNS = 16;
 
