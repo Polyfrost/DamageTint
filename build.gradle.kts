@@ -204,9 +204,6 @@ tasks.publishMods.configure {
 tasks.matching { it.name == "publishModrinth" }.configureEach {
     dependsOn(validateChangelog)
 }
-tasks.matching { it.name.startsWith("publish") }.configureEach {
-    enabled = isOrnithe
-}
 
 publishMods {
     file = loomx.modJar.flatMap { it.archiveFile }
