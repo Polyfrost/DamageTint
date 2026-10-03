@@ -13,6 +13,9 @@ public class DamageTintMixinPlugin implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         List<String> mixins = new ArrayList<>();
+        //? if >1.8.9 {
+        mixins.add("client.Mixin_ModifyTintColor");
+        //?}
         //? if >=1.21.4 {
         mixins.add("client.Mixin_EntityRenderState");
         //?}

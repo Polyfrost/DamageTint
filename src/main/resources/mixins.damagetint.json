@@ -6,7 +6,6 @@
     "refmap": "mixins.${mod_id}.refmap.json",
     "plugin": "org.polyfrost.damagetint.plugin.DamageTintMixinPlugin",
     "client": [
-        "client.Mixin_ModifyTintColor",
         "client.Mixin_ClientPacketListener",
         "client.Mixin_LivingEntity",
         "client.Mixin_LivingEntityRenderer",
