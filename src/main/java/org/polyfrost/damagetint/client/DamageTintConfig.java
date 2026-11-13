@@ -1,8 +1,6 @@
 package org.polyfrost.damagetint.client;
 
 import net.minecraft.client.Minecraft;
-//? if >1.8.9
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.polyfrost.compose.render.PolyColor;
 import org.polyfrost.damagetint.DamageTintConstants;
 import org.polyfrost.damagetint.client.utils.DamageVariant;
@@ -111,6 +109,11 @@ public class DamageTintConfig extends Config {
         save();
     }
 
+    @Override
+    protected void onInitialized(Tree tree) {
+        updateOverlayColors();
+    }
+
     public static boolean hasChroma() {
         if (colorV2.getChroma()) {
             return true;
@@ -143,22 +146,35 @@ public class DamageTintConfig extends Config {
 
     public static void updateOverlayColors() {
         //? if >1.8.9 {
-        Minecraft.getInstance().execute(() -> {
-            int[] columns = new int[DamageVariant.COLUMNS];
-            Arrays.fill(columns, enabled ? colorV2.getArgb() : defaultColor);
-
-            if (enabled && DamageTypeColors.enabled) {
-                columns[DamageVariant.MELEE.column()] = DamageTypeColors.melee.getArgb();
-                columns[DamageVariant.MACE.column()] = DamageTypeColors.mace.getArgb();
-                columns[DamageVariant.RANGED.column()] = DamageTypeColors.ranged.getArgb();
-                columns[DamageVariant.EXPLOSION.column()] = DamageTypeColors.explosion.getArgb();
-                columns[DamageVariant.MAGIC.column()] = DamageTypeColors.magic.getArgb();
-                columns[DamageVariant.CRIT.column()] = DamageTypeColors.crit.getArgb();
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            if (minecraft.gameRenderer != null) {
+                applyOverlayColors((OverlayModifier) minecraft.gameRenderer.overlayTexture());
             }
-
-            OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
-            ((OverlayModifier) overlayTexture).damageTint$setOverlayColors(columns, enabled && fade);
         });
         //?}
     }
+
+    //? if >1.8.9 {
+    public static void applyOverlayColors(OverlayModifier overlay) {
+        if (!enabled) {
+            overlay.damageTint$restoreOverlayColors();
+            return;
+        }
+
+        int[] columns = new int[DamageVariant.COLUMNS];
+        Arrays.fill(columns, colorV2.getArgb());
+
+        if (DamageTypeColors.enabled) {
+            columns[DamageVariant.MELEE.column()] = DamageTypeColors.melee.getArgb();
+            columns[DamageVariant.MACE.column()] = DamageTypeColors.mace.getArgb();
+            columns[DamageVariant.RANGED.column()] = DamageTypeColors.ranged.getArgb();
+            columns[DamageVariant.EXPLOSION.column()] = DamageTypeColors.explosion.getArgb();
+            columns[DamageVariant.MAGIC.column()] = DamageTypeColors.magic.getArgb();
+            columns[DamageVariant.CRIT.column()] = DamageTypeColors.crit.getArgb();
+        }
+
+        overlay.damageTint$setOverlayColors(columns, fade);
+    }
+    //?}
 }
