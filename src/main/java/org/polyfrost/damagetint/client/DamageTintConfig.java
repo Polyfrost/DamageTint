@@ -157,10 +157,15 @@ public class DamageTintConfig extends Config {
 
     //? if >1.8.9 {
     public static void applyOverlayColors(OverlayModifier overlay) {
-        int[] columns = new int[DamageVariant.COLUMNS];
-        Arrays.fill(columns, enabled ? colorV2.getArgb() : defaultColor);
+        if (!enabled) {
+            overlay.damageTint$restoreOverlayColors();
+            return;
+        }
 
-        if (enabled && DamageTypeColors.enabled) {
+        int[] columns = new int[DamageVariant.COLUMNS];
+        Arrays.fill(columns, colorV2.getArgb());
+
+        if (DamageTypeColors.enabled) {
             columns[DamageVariant.MELEE.column()] = DamageTypeColors.melee.getArgb();
             columns[DamageVariant.MACE.column()] = DamageTypeColors.mace.getArgb();
             columns[DamageVariant.RANGED.column()] = DamageTypeColors.ranged.getArgb();
@@ -169,7 +174,7 @@ public class DamageTintConfig extends Config {
             columns[DamageVariant.CRIT.column()] = DamageTypeColors.crit.getArgb();
         }
 
-        overlay.damageTint$setOverlayColors(columns, enabled && fade);
+        overlay.damageTint$setOverlayColors(columns, fade);
     }
     //?}
 }

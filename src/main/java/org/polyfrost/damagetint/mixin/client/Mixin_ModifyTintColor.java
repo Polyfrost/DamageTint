@@ -21,10 +21,45 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Final
     private DynamicTexture texture;
 
-    // Other mods can replace the overlay texture
+    @Unique
+    private int damageTint$originalPixel;
+
+    // Other mods can replace the overlay texture or change its vanilla color
     @Inject(method = "<init>", at = @At("TAIL"))
     private void damageTint$applyConfiguredColors(CallbackInfo ci) {
-        DamageTintConfig.applyOverlayColors(this);
+        NativeImage image = this.texture.getPixels();
+        if (image == null) {
+            return;
+        }
+        //? if >=1.21.4 {
+        damageTint$originalPixel = image.getPixel(0, 0);
+        //?} else {
+        /*damageTint$originalPixel = image.getPixelRGBA(0, 0);
+        *///?}
+        if (DamageTintConfig.enabled) {
+            DamageTintConfig.applyOverlayColors(this);
+        }
+    }
+
+    @Override
+    @Unique
+    public void damageTint$restoreOverlayColors() {
+        NativeImage image = this.texture.getPixels();
+        if (image == null) {
+            throw new IllegalStateException("Overlay texture's image is null");
+        }
+
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight() / 2; y++) {
+                //? if >=1.21.4 {
+                image.setPixel(x, y, damageTint$originalPixel);
+                //?} else {
+                /*image.setPixelRGBA(x, y, damageTint$originalPixel);
+                *///?}
+            }
+        }
+
+        this.texture.upload();
     }
 
     @Override
