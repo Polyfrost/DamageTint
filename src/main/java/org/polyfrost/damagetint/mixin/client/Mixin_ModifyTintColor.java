@@ -21,7 +21,7 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Unique
     private int[] damageTint$original;
 
-    // Pixels DamageTint last wrote. Channels that no longer match were changed by another mod and are left alone.
+    // Pixels DamageTint last wrote. Colour or alpha that no longer matches was changed by another mod and are left alone.
     @Unique
     private int[] damageTint$written;
 
@@ -84,15 +84,16 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
         this.texture.upload();
     }
 
-    // Per channel: the original value where the pixel still holds what DamageTint wrote, else the current value
+    // Colour and alpha are compared separately: the original where the pixel still holds what DamageTint wrote, else
+    // the current value. Colour is one unit so a mod's colour that shares a channel value with DamageTint's stays whole.
     @Unique
     private static int damageTint$merge(int current, int written, int original) {
-        int result = 0;
-        for (int shift = 0; shift < 32; shift += 8) {
-            int mask = 0xFF << shift;
-            result |= ((current & mask) == (written & mask) ? original : current) & mask;
-        }
-        return result;
+        return damageTint$mergePart(current, written, original, 0x00FFFFFF) | damageTint$mergePart(current, written, original, 0xFF000000);
+    }
+
+    @Unique
+    private static int damageTint$mergePart(int current, int written, int original, int mask) {
+        return ((current & mask) == (written & mask) ? original : current) & mask;
     }
 
     @Unique
