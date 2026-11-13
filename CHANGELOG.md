@@ -1,3 +1,2 @@
-## 3.7.2
-- Change default critical hit tint to gold
-- Add 1.8 block tint color
+## 3.7.3
+- fix: keep the saved tint color after a restart or profile switch
