@@ -1,8 +1,6 @@
 package org.polyfrost.damagetint.client;
 
 import net.minecraft.client.Minecraft;
-//? if >1.8.9
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.polyfrost.compose.render.PolyColor;
 import org.polyfrost.damagetint.DamageTintConstants;
 import org.polyfrost.damagetint.client.utils.DamageVariant;
@@ -143,22 +141,26 @@ public class DamageTintConfig extends Config {
 
     public static void updateOverlayColors() {
         //? if >1.8.9 {
-        Minecraft.getInstance().execute(() -> {
-            int[] columns = new int[DamageVariant.COLUMNS];
-            Arrays.fill(columns, enabled ? colorV2.getArgb() : defaultColor);
-
-            if (enabled && DamageTypeColors.enabled) {
-                columns[DamageVariant.MELEE.column()] = DamageTypeColors.melee.getArgb();
-                columns[DamageVariant.MACE.column()] = DamageTypeColors.mace.getArgb();
-                columns[DamageVariant.RANGED.column()] = DamageTypeColors.ranged.getArgb();
-                columns[DamageVariant.EXPLOSION.column()] = DamageTypeColors.explosion.getArgb();
-                columns[DamageVariant.MAGIC.column()] = DamageTypeColors.magic.getArgb();
-                columns[DamageVariant.CRIT.column()] = DamageTypeColors.crit.getArgb();
-            }
-
-            OverlayTexture overlayTexture = Minecraft.getInstance().gameRenderer.overlayTexture();
-            ((OverlayModifier) overlayTexture).damageTint$setOverlayColors(columns, enabled && fade);
-        });
+        Minecraft.getInstance().execute(() ->
+                applyOverlayColors((OverlayModifier) Minecraft.getInstance().gameRenderer.overlayTexture()));
         //?}
     }
+
+    //? if >1.8.9 {
+    public static void applyOverlayColors(OverlayModifier overlay) {
+        int[] columns = new int[DamageVariant.COLUMNS];
+        Arrays.fill(columns, enabled ? colorV2.getArgb() : defaultColor);
+
+        if (enabled && DamageTypeColors.enabled) {
+            columns[DamageVariant.MELEE.column()] = DamageTypeColors.melee.getArgb();
+            columns[DamageVariant.MACE.column()] = DamageTypeColors.mace.getArgb();
+            columns[DamageVariant.RANGED.column()] = DamageTypeColors.ranged.getArgb();
+            columns[DamageVariant.EXPLOSION.column()] = DamageTypeColors.explosion.getArgb();
+            columns[DamageVariant.MAGIC.column()] = DamageTypeColors.magic.getArgb();
+            columns[DamageVariant.CRIT.column()] = DamageTypeColors.crit.getArgb();
+        }
+
+        overlay.damageTint$setOverlayColors(columns, enabled && fade);
+    }
+    //?}
 }
