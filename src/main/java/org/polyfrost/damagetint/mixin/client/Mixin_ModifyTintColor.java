@@ -21,12 +21,13 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Final
     private DynamicTexture texture;
 
+    // Per-pixel snapshot of the top half before DamageTint wrote it, or null when DamageTint has not tinted
     @Unique
-    private int damageTint$originalPixel;
+    private int[] damageTint$original;
 
-    // Only restore pixels DamageTint wrote, so other mods' later tint changes survive while disabled
+    // Pixels DamageTint last wrote. Pixels that no longer match were changed by another mod and are left alone.
     @Unique
-    private boolean damageTint$owned;
+    private int[] damageTint$written;
 
     // Other mods can replace the overlay texture or change its vanilla color
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -39,24 +40,21 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Override
     @Unique
     public void damageTint$restoreOverlayColors() {
-        if (!damageTint$owned) {
+        if (damageTint$written == null) {
             return;
         }
-        NativeImage image = this.texture.getPixels();
-        if (image == null) {
-            throw new IllegalStateException("Overlay texture's image is null");
-        }
-        damageTint$owned = false;
-
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight() / 2; y++) {
-                //? if >=1.21.4 {
-                image.setPixel(x, y, damageTint$originalPixel);
-                //?} else {
-                /*image.setPixelRGBA(x, y, damageTint$originalPixel);
-                *///?}
+        NativeImage image = damageTint$image();
+        int width = image.getWidth();
+        for (int y = 0; y < image.getHeight() / 2; y++) {
+            for (int x = 0; x < width; x++) {
+                int i = y * width + x;
+                if (damageTint$getPixel(image, x, y) == damageTint$written[i]) {
+                    damageTint$setPixel(image, x, y, damageTint$original[i]);
+                }
             }
         }
+        damageTint$original = null;
+        damageTint$written = null;
 
         this.texture.upload();
     }
@@ -64,21 +62,16 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Override
     @Unique
     public void damageTint$setOverlayColors(int[] argbByColumn, boolean fade) {
-        NativeImage image = this.texture.getPixels();
-        if (image == null) {
-            throw new IllegalStateException("Overlay texture's image is null");
-        }
-        if (!damageTint$owned) {
-            //? if >=1.21.4 {
-            damageTint$originalPixel = image.getPixel(0, 0);
-            //?} else {
-            /*damageTint$originalPixel = image.getPixelRGBA(0, 0);
-            *///?}
-            damageTint$owned = true;
+        NativeImage image = damageTint$image();
+        int width = image.getWidth();
+        int rows = image.getHeight() / 2;
+        boolean owned = damageTint$written != null;
+        if (!owned) {
+            damageTint$original = new int[width * rows];
+            damageTint$written = new int[width * rows];
         }
 
-        int rows = image.getHeight() / 2;
-        for (int x = 0; x < image.getWidth(); x++) {
+        for (int x = 0; x < width; x++) {
             int argb = argbByColumn[Math.min(x, argbByColumn.length - 1)];
             int r = argb >> 16 & 0xFF;
             int g = argb >> 8 & 0xFF;
@@ -90,15 +83,48 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
                 int currentAlpha = (int) (255 - ((255 - a) * percent));
                 //? if >=1.21.4 {
                 int packedColor = (currentAlpha << 24 | r << 16 | g << 8 | b);
-                image.setPixel(x, y, packedColor);
                 //?} else {
                 /*int packedColor = (currentAlpha << 24 | b << 16 | g << 8 | r);
-                image.setPixelRGBA(x, y, packedColor);
                 *///?}
+                int i = y * width + x;
+                int current = damageTint$getPixel(image, x, y);
+                // Re-snapshot pixels another mod changed since DamageTint's last write
+                if (!owned || current != damageTint$written[i]) {
+                    damageTint$original[i] = current;
+                }
+                damageTint$setPixel(image, x, y, packedColor);
+                damageTint$written[i] = packedColor;
             }
         }
 
         this.texture.upload();
+    }
+
+    @Unique
+    private NativeImage damageTint$image() {
+        NativeImage image = this.texture.getPixels();
+        if (image == null) {
+            throw new IllegalStateException("Overlay texture's image is null");
+        }
+        return image;
+    }
+
+    @Unique
+    private static int damageTint$getPixel(NativeImage image, int x, int y) {
+        //? if >=1.21.4 {
+        return image.getPixel(x, y);
+        //?} else {
+        /*return image.getPixelRGBA(x, y);
+        *///?}
+    }
+
+    @Unique
+    private static void damageTint$setPixel(NativeImage image, int x, int y, int color) {
+        //? if >=1.21.4 {
+        image.setPixel(x, y, color);
+        //?} else {
+        /*image.setPixelRGBA(x, y, color);
+        *///?}
     }
 }
 //?}
