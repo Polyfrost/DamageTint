@@ -24,19 +24,14 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Unique
     private int damageTint$originalPixel;
 
+    // Only restore pixels DamageTint wrote, so other mods' later tint changes survive while disabled
+    @Unique
+    private boolean damageTint$owned;
+
     // Other mods can replace the overlay texture or change its vanilla color
     @Inject(method = "<init>", at = @At("TAIL"))
     private void damageTint$applyConfiguredColors(CallbackInfo ci) {
-        NativeImage image = this.texture.getPixels();
-        if (image == null) {
-            return;
-        }
-        //? if >=1.21.4 {
-        damageTint$originalPixel = image.getPixel(0, 0);
-        //?} else {
-        /*damageTint$originalPixel = image.getPixelRGBA(0, 0);
-        *///?}
-        if (DamageTintConfig.enabled) {
+        if (DamageTintConfig.enabled && this.texture.getPixels() != null) {
             DamageTintConfig.applyOverlayColors(this);
         }
     }
@@ -44,10 +39,14 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Override
     @Unique
     public void damageTint$restoreOverlayColors() {
+        if (!damageTint$owned) {
+            return;
+        }
         NativeImage image = this.texture.getPixels();
         if (image == null) {
             throw new IllegalStateException("Overlay texture's image is null");
         }
+        damageTint$owned = false;
 
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight() / 2; y++) {
@@ -68,6 +67,14 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
         NativeImage image = this.texture.getPixels();
         if (image == null) {
             throw new IllegalStateException("Overlay texture's image is null");
+        }
+        if (!damageTint$owned) {
+            //? if >=1.21.4 {
+            damageTint$originalPixel = image.getPixel(0, 0);
+            //?} else {
+            /*damageTint$originalPixel = image.getPixelRGBA(0, 0);
+            *///?}
+            damageTint$owned = true;
         }
 
         int rows = image.getHeight() / 2;
