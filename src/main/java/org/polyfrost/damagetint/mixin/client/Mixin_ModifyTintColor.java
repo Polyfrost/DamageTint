@@ -21,7 +21,7 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
     @Unique
     private int[] damageTint$original;
 
-    // Pixels DamageTint last wrote. Pixels that no longer match were changed by another mod and are left alone.
+    // Pixels DamageTint last wrote. Channels that no longer match were changed by another mod and are left alone.
     @Unique
     private int[] damageTint$written;
 
@@ -36,9 +36,7 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
         for (int y = 0; y < image.getHeight() / 2; y++) {
             for (int x = 0; x < width; x++) {
                 int i = y * width + x;
-                if (damageTint$getPixel(image, x, y) == damageTint$written[i]) {
-                    damageTint$setPixel(image, x, y, damageTint$original[i]);
-                }
+                damageTint$setPixel(image, x, y, damageTint$merge(damageTint$getPixel(image, x, y), damageTint$written[i], damageTint$original[i]));
             }
         }
         damageTint$original = null;
@@ -76,16 +74,25 @@ public class Mixin_ModifyTintColor implements OverlayModifier {
                 *///?}
                 int i = y * width + x;
                 int current = damageTint$getPixel(image, x, y);
-                // Re-snapshot pixels another mod changed since DamageTint's last write
-                if (!owned || current != damageTint$written[i]) {
-                    damageTint$original[i] = current;
-                }
+                // Re-snapshot channels another mod changed since DamageTint's last write
+                damageTint$original[i] = owned ? damageTint$merge(current, damageTint$written[i], damageTint$original[i]) : current;
                 damageTint$setPixel(image, x, y, packedColor);
                 damageTint$written[i] = packedColor;
             }
         }
 
         this.texture.upload();
+    }
+
+    // Per channel: the original value where the pixel still holds what DamageTint wrote, else the current value
+    @Unique
+    private static int damageTint$merge(int current, int written, int original) {
+        int result = 0;
+        for (int shift = 0; shift < 32; shift += 8) {
+            int mask = 0xFF << shift;
+            result |= ((current & mask) == (written & mask) ? original : current) & mask;
+        }
+        return result;
     }
 
     @Unique
