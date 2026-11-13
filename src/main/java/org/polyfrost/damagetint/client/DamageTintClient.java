@@ -2,7 +2,6 @@ package org.polyfrost.damagetint.client;
 
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.FramebufferRenderEvent;
-import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,6 @@ public class DamageTintClient {
 
     public void initialize() {
         DamageTintConfig.INSTANCE.preload();
-        EventManager.register(InitializationEvent.class, DamageTintConfig::updateOverlayColors);
         EventManager.register(FramebufferRenderEvent.Start.class, this::updateChroma);
     }
 

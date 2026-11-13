@@ -109,6 +109,11 @@ public class DamageTintConfig extends Config {
         save();
     }
 
+    @Override
+    protected void onInitialized(Tree tree) {
+        updateOverlayColors();
+    }
+
     public static boolean hasChroma() {
         if (colorV2.getChroma()) {
             return true;
@@ -141,8 +146,12 @@ public class DamageTintConfig extends Config {
 
     public static void updateOverlayColors() {
         //? if >1.8.9 {
-        Minecraft.getInstance().execute(() ->
-                applyOverlayColors((OverlayModifier) Minecraft.getInstance().gameRenderer.overlayTexture()));
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            if (minecraft.gameRenderer != null) {
+                applyOverlayColors((OverlayModifier) minecraft.gameRenderer.overlayTexture());
+            }
+        });
         //?}
     }
 
